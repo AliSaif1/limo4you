@@ -99,22 +99,23 @@ const Hero = () => {
             </motion.div>
           </div>
 
-          {/* Image placeholder */}
+          {/* Enhanced Image section - only shows on desktop */}
           <motion.div
             className="hidden lg:block relative w-full max-w-xl"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <div className="relative aspect-square rounded-xl overflow-hidden shadow-2xl border-4 border-white/10">
-              <div className="absolute inset-0 bg-gradient-to-br from-primary to-secondary opacity-30" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <span className="text-white text-lg font-medium">Premium Limousine Image</span>
-                </div>
-              </div>
+            <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-2xl border-4 border-white/10 transform hover:scale-[1.02] transition-transform duration-300">
+              <img
+                src='https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'
+                alt='Premium Limousine Service'
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-secondary/30" />
             </div>
             <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-secondary rounded-lg blur-[60px] opacity-20 z-[-1]" />
+            <div className="absolute -top-6 -right-6 w-24 h-24 bg-white rounded-full blur-[50px] opacity-10 z-[-1]" />
           </motion.div>
         </motion.div>
       </div>

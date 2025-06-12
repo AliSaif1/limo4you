@@ -6,10 +6,12 @@ import Contact from './pages/Contact';
 import Footer from './components/Footer';
 import Services from './pages/Services';
 import Fleet from './pages/Fleet';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Navbar />
       <div className="min-h-screen bg-gray-100 p-6">
         <Routes>
