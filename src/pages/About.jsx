@@ -2,7 +2,7 @@ import { Car, ShieldCheck, Star, Users, Clock, MapPin } from 'lucide-react';
 
 function About() {
   return (
-    <div className="bg-background min-h-screen mt-16">
+    <div className="bg-background min-h-screen mt-20">
       {/* Hero Section */}
       <div className="bg-primary py-20 px-4 sm:px-6 lg:px-8 text-center">
         <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-6">

@@ -17,8 +17,8 @@ const Navbar = () => {
     { name: "Home", path: "/" },
     { name: "Services", path: "/services" },
     { name: "Fleet", path: "/fleet" },
-    // { name: "About", path: "/about" },
-    // { name: "Contact", path: "/contact" }
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" }
   ];
 
   return (
@@ -26,11 +26,14 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex items-center space-x-1">
-            <a href="/" className="flex items-center">
-              <span className="text-secondary font-display font-bold text-2xl md:text-3xl">LIMO</span>
-              <span className="text-secondary font-display font-bold text-2xl md:text-3xl">4</span>
-              <span className="font-display font-bold text-2xl md:text-3xl text-white">YOU</span>
+          <div className="flex-shrink-0 mr-auto -ml-7">
+            <a href="/" className="flex items-center h-full">
+              <img
+                src="/logo.png"
+                alt="Limo 4 All Logo"
+                className="w-[150px] h-[60px] object-contain object-left"
+                style={{ minWidth: '150px' }}
+              />
             </a>
           </div>
 
