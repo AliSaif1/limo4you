@@ -149,7 +149,7 @@ const Hero = () => {
               variants={itemVariants}
             >
               <motion.a
-                href="/booking"
+                href="#booking-form"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
                 className="bg-secondary hover:bg-secondary-dark text-primary font-bold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3 group"

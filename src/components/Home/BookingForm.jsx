@@ -31,31 +31,6 @@ const generateTimeSlots = () => {
   return slots;
 };
 
-const validateForm = (formData, bookedSlots) => {
-  const errors = {};
-
-  if (!formData.vehicleType) errors.vehicleType = 'Please select a vehicle';
-  if (!formData.date) errors.date = 'Please select a date';
-  if (!formData.time) errors.time = 'Please select a time';
-  if (!formData.pickup) errors.pickup = 'Pickup location is required';
-  if (!formData.destination) errors.destination = 'Destination is required';
-  if (!formData.name) errors.name = 'Name is required';
-  if (!formData.email) errors.email = 'Email is required';
-  if (!formData.phone) errors.phone = 'Phone number is required';
-
-  // Check if passengers exceed vehicle capacity
-  const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
-  if (selectedVehicle && formData.passengers > selectedVehicle.capacity) {
-    errors.passengers = `This vehicle can only accommodate up to ${selectedVehicle.capacity} passengers`;
-  }
-
-  if (formData.time && !isTimeSlotAvailable(formData.time, MINIMUM_DURATION, bookedSlots)) {
-    errors.time = 'This time slot is no longer available';
-  }
-
-  return errors;
-};
-
 const isTimeSlotAvailable = (timeToCheck, duration, bookedSlots) => {
   const [hours, minutes] = timeToCheck.split(':').map(Number);
   const checkTime = hours * 60 + minutes;
@@ -793,7 +768,7 @@ const BookingForm = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div id="booking-form" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 sm:p-8">
           <div className="text-center mb-8">

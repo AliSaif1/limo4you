@@ -1,55 +1,385 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
+import Modal from 'react-modal';
+
+Modal.setAppElement('#root');
+
+// Constants
+const TIME_SLOTS = (() => {
+  const slots = [];
+  for (let hour = 8; hour <= 20; hour += 3) {
+    const endHour = hour + 3;
+    slots.push(`${hour}:00 - ${endHour}:00`);
+  }
+  return slots;
+})();
+
+const LIMOUSINES = [
+  {
+    id: 1,
+    name: "Executive Stretch Limousine",
+    image: "./Executive-Limo.png",
+    capacity: "8-10 passengers",
+    maxPassengers: 10,
+    features: [
+      "Plush leather seating",
+      "Premium sound system",
+      "LED mood lighting",
+      "Champagne service"
+    ],
+    price: "$150/hour",
+    note: "Minimum 3 hour booking"
+  },
+  {
+    id: 2,
+    name: "Luxury Party Limousine",
+    image: "./Party-Limo.png",
+    capacity: "12-14 passengers",
+    maxPassengers: 14,
+    features: [
+      "Extended luxury interior",
+      "State-of-the-art entertainment",
+      "Mini bar setup",
+      "Privacy partitions"
+    ],
+    price: "$200/hour",
+    note: "Ideal for weddings and celebrations"
+  },
+  {
+    id: 3,
+    name: "Luxury Sedan",
+    image: "./Sedan.png",
+    capacity: "3 passengers",
+    maxPassengers: 3,
+    features: [
+      "Executive class comfort",
+      "WiFi connectivity",
+      "Workstation setup",
+      "Discreet professional service"
+    ],
+    price: "$120/hour",
+    note: "Perfect for corporate travel"
+  }
+];
+
+// Sub-components
+const StepIndicator = ({ currentStep }) => (
+  <div className="flex justify-center mb-8">
+    <div className="flex items-center">
+      <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 1 ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>
+        <span className="font-medium">1</span>
+      </div>
+      <div className={`w-16 h-1 mx-2 ${currentStep === 2 ? 'bg-primary' : 'bg-gray-200'}`}></div>
+      <div className={`flex items-center justify-center w-10 h-10 rounded-full ${currentStep === 2 ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>
+        <span className="font-medium">2</span>
+      </div>
+    </div>
+  </div>
+);
+
+const CloseButton = ({ onClose }) => (
+  <button
+    onClick={onClose}
+    className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+    aria-label="Close modal"
+  >
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+);
+
+const ModalHeader = ({ selectedLimo }) => (
+  <>
+    <h2 className="text-2xl font-bold text-text-primary mb-2 text-center">
+      Reserve {selectedLimo?.name}
+    </h2>
+    <p className="text-text-secondary mb-6 text-center text-sm">{selectedLimo?.capacity}</p>
+  </>
+);
+
+const ReservationSummary = ({ selectedLimo, formData }) => (
+  <div className="mt-6 space-y-3">
+    <h3 className="font-bold text-lg">Reservation Summary</h3>
+    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+      <div className="flex justify-between border-b border-gray-200 pb-2 mb-2">
+        <p className="font-medium">{selectedLimo?.name}</p>
+        <p className="text-sm text-text-secondary">{selectedLimo?.price}</p>
+      </div>
+      <div className="space-y-1 text-sm">
+        <p><span className="font-medium text-text-primary">Capacity:</span> {selectedLimo?.capacity}</p>
+        <p><span className="font-medium text-text-primary">Date:</span> {formData.date}</p>
+        <p><span className="font-medium text-text-primary">Time:</span> {formData.slot}</p>
+        <p><span className="font-medium text-text-primary">Contact:</span> {formData.email || formData.phone}</p>
+      </div>
+    </div>
+  </div>
+);
+
+const ConfirmationMessage = ({ onClose }) => (
+  <div className="text-center py-8">
+    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+    </div>
+    <h3 className="text-xl font-bold text-text-primary mb-2">Reservation Confirmed!</h3>
+    <p className="text-text-secondary mb-6">We've sent the details to your email. Our team will contact you shortly.</p>
+    <button
+      onClick={onClose}
+      className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium"
+    >
+      Close
+    </button>
+  </div>
+);
 
 const Fleet = () => {
   const navigate = useNavigate();
-  const limousines = [
-    {
-      id: 1,
-      name: "Executive Stretch Limousine",
-      image: "./Executive-Limo.png",
-      capacity: "8-10 passengers",
-      features: [
-        "Plush leather seating",
-        "Premium sound system",
-        "LED mood lighting",
-        "Champagne service"
-      ],
-      price: "$150/hour",
-      note: "Minimum 3 hour booking"
-    },
-    {
-      id: 2,
-      name: "Luxury Party Limousine",
-      image: "./Party-Limo.png",
-      capacity: "12-14 passengers",
-      features: [
-        "Extended luxury interior",
-        "State-of-the-art entertainment",
-        "Mini bar setup",
-        "Privacy partitions"
-      ],
-      price: "$200/hour",
-      note: "Ideal for weddings and celebrations"
-    },
-    {
-      id: 3,
-      name: "Luxury Sedan",
-      image: "./Sedan.png",
-      capacity: "3 passengers",
-      features: [
-        "Executive class comfort",
-        "WiFi connectivity",
-        "Workstation setup",
-        "Discreet professional service"
-      ],
-      price: "$120/hour",
-      note: "Perfect for corporate travel"
-    }
-  ];
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedLimo, setSelectedLimo] = useState(null);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    email: '',
+    phone: '',
+    name: '',
+    date: '',
+    slot: '',
+    pickup: '',
+    destination: '',
+    passengers: 1
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleViewFleet = () => {
-    navigate('/fleet');
+  const handleViewFleet = () => navigate('/fleet');
+
+  const handleReserveClick = (limo) => {
+    setSelectedLimo(limo);
+    setIsModalOpen(true);
+    setIsSubmitted(false);
+    setCurrentStep(1);
+    setFormData({
+      email: '',
+      phone: '',
+      name: '',
+      date: '',
+      slot: '',
+      pickup: '',
+      destination: '',
+      passengers: 1
+    });
+    setFormErrors({});
   };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleNextStep = () => {
+    const errors = {};
+    if (!formData.email && !formData.phone) errors.contact = 'Either email or phone number is required';
+    if (!formData.date) errors.date = 'Date is required';
+    if (!formData.slot) errors.slot = 'Time slot is required';
+
+    setFormErrors(errors);
+    if (Object.keys(errors).length === 0) setCurrentStep(2);
+  };
+
+  const handlePrevStep = () => setCurrentStep(1);
+
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.pickup) errors.pickup = 'Pickup location is required';
+    if (!formData.destination) errors.destination = 'Destination is required';
+    if (formData.passengers > selectedLimo.maxPassengers) {
+      errors.passengers = `Maximum ${selectedLimo.maxPassengers} passengers allowed`;
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setIsLoading(true); // Set loading to true when submission starts
+    try {
+      await addDoc(collection(db, 'reservations'), {
+        vehicleType: selectedLimo.name,
+        ...formData,
+        createdAt: new Date(),
+        status: 'pending'
+      });
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Error adding reservation: ', error);
+      setFormErrors({ submit: 'There was an error submitting your reservation. Please try again.' });
+    } finally {
+      setIsLoading(false); // Set loading to false when done
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentStep(1);
+    setIsSubmitted(false);
+  };
+
+  const renderStepOne = () => (
+    <div className="space-y-5">
+      <div>
+        <label className="block text-sm font-medium text-text-primary mb-2">Name</label>
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          placeholder="Your full name"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            placeholder="your@email.com"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Phone Number</label>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            placeholder="(123) 456-7890"
+          />
+        </div>
+      </div>
+      {formErrors.contact && <p className="text-red-500 text-sm -mt-3">{formErrors.contact}</p>}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Date</label>
+          <input
+            type="date"
+            name="date"
+            value={formData.date}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            min={new Date().toISOString().split('T')[0]}
+          />
+          {formErrors.date && <p className="text-red-500 text-sm -mt-3">{formErrors.date}</p>}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">Time Slot</label>
+          <select
+            name="slot"
+            value={formData.slot}
+            onChange={handleInputChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tZG93biI+PHBhdGggZD0ibTYgOSA2IDYgNi02Ii8+PC9zdmc+')] bg-no-repeat bg-[center_right_1rem]"
+          >
+            <option value="">Select time</option>
+            {TIME_SLOTS.map((slot, index) => (
+              <option key={index} value={slot}>{slot}</option>
+            ))}
+          </select>
+          {formErrors.slot && <p className="text-red-500 text-sm -mt-3">{formErrors.slot}</p>}
+        </div>
+      </div>
+
+      <div className="pt-2">
+        <button
+          type="button"
+          onClick={handleNextStep}
+          className="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
+          disabled={!formData.date || !formData.slot || (!formData.email && !formData.phone)}
+        >
+          Continue to Trip Details
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderStepTwo = () => (
+    <div className="space-y-5">
+      <div>
+        <label className="block text-sm font-medium text-text-primary mb-2">Pickup Location</label>
+        <input
+          type="text"
+          name="pickup"
+          value={formData.pickup}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          placeholder="Where should we pick you up?"
+        />
+        {formErrors.pickup && <p className="text-red-500 text-sm -mt-3">{formErrors.pickup}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text-primary mb-2">Destination</label>
+        <input
+          type="text"
+          name="destination"
+          value={formData.destination}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          placeholder="Where are you going?"
+        />
+        {formErrors.destination && <p className="text-red-500 text-sm -mt-3">{formErrors.destination}</p>}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-text-primary mb-2">
+          Number of Passengers (max {selectedLimo?.maxPassengers})
+        </label>
+        <input
+          type="number"
+          name="passengers"
+          min="1"
+          max={selectedLimo?.maxPassengers}
+          value={formData.passengers}
+          onChange={handleInputChange}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+        />
+        {formErrors.passengers && <p className="text-red-500 text-sm -mt-3">{formErrors.passengers}</p>}
+      </div>
+
+      <ReservationSummary selectedLimo={selectedLimo} formData={formData} />
+
+      <div className="pt-2 flex justify-between gap-4">
+        <button
+          type="button"
+          onClick={handlePrevStep}
+          className="flex-1 py-3 border border-gray-300 rounded-lg text-text-primary hover:bg-gray-50 transition-colors font-medium"
+          disabled={isLoading} // Disable during loading
+        >
+          Back
+        </button>
+        <button
+          type="submit"
+          className="flex-1 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium flex items-center justify-center"
+          disabled={isLoading}
+        >
+          Confirm Reservation
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <section className="py-20 bg-background mt-6" id="fleet" itemScope itemType="https://schema.org/ProductCollection">
@@ -69,7 +399,7 @@ const Fleet = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
-          {limousines.map((limo) => (
+          {LIMOUSINES.map((limo) => (
             <div
               key={limo.id}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
@@ -119,6 +449,7 @@ const Fleet = () => {
                       )}
                     </div>
                     <button
+                      onClick={() => handleReserveClick(limo)}
                       className="bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
                       aria-label={`Reserve ${limo.name}`}
                     >
@@ -141,6 +472,92 @@ const Fleet = () => {
           </button>
         </div>
       </div>
+
+      {/* Reservation Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        className="modal"
+        overlayClassName="modal-overlay"
+        contentLabel="Reservation Form"
+      >
+        {/* Add loading overlay */}
+        {isLoading && (
+          <div className="loading-overlay">
+            <div className="loading-spinner"></div>
+          </div>
+        )}
+
+        <div className={`bg-white rounded-xl p-6 max-w-md mx-auto relative ${isLoading ? 'opacity-70' : ''}`}>
+          <CloseButton onClose={closeModal} />
+
+          {isSubmitted ? (
+            <ConfirmationMessage onClose={closeModal} />
+          ) : (
+            <>
+              <StepIndicator currentStep={currentStep} />
+              <ModalHeader selectedLimo={selectedLimo} />
+              <form onSubmit={handleSubmit}>
+                {currentStep === 1 ? renderStepOne() : renderStepTwo()}
+              </form>
+            </>
+          )}
+        </div>
+      </Modal>
+
+      <style jsx global>{`
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 1rem;
+          backdrop-filter: blur(4px);
+        }
+        
+        .modal {
+          background: transparent;
+          outline: none;
+          max-height: 90vh;
+          overflow-y: auto;
+          width: 100%;
+          max-width: 32rem;
+        }
+
+        .loading-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(255, 255, 255, 0.8);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1001;
+          backdrop-filter: blur(2px);
+        }
+
+        .loading-spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border-left-color: rgba(6, 0, 47, 0.1);
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }`
+      }</style>
     </section>
   );
 };

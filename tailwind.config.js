@@ -12,20 +12,20 @@ module.exports = {
           light: '#1E293B',
         },
         secondary: {
-          DEFAULT: '#F59E0B', 
+          DEFAULT: '#F59E0B',
           light: '#FBBF24',
         },
         accent: {
-          DEFAULT: '#10B981', 
-          light: '#34D399', 
+          DEFAULT: '#10B981',
+          light: '#34D399',
         },
         background: '#F8FAFC',
         text: {
-          primary: '#1E293B', 
+          primary: '#1E293B',
           secondary: '#64748B',
         },
-        error: '#EF4444', 
-        success: '#10B981', 
+        error: '#EF4444',
+        success: '#10B981',
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -34,4 +34,7 @@ module.exports = {
     },
   },
   plugins: [],
+  extend: {
+    scrollBehavior: ['responsive'],
+  }
 }
