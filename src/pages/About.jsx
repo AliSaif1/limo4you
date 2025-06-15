@@ -174,7 +174,7 @@ function About() {
                 name: "Stretch Limousines",
                 description: "10-14 passenger luxury coaches",
                 features: ["LED lighting", "Premium bar", "Entertainment"],
-                image: "./Executive-limo.png"
+                image: "./Executive-Limo.png"
               },
             ].map((vehicle, index) => (
               <div
