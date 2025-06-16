@@ -103,12 +103,6 @@ const Hero = () => {
               {/* Decorative elements */}
               <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-secondary/30" />
 
-              {/* Floating badge */}
-              <div className="absolute -bottom-4 -right-4 bg-secondary text-primary px-4 py-2 rounded-full font-bold text-sm shadow-lg flex items-center gap-1">
-                <Sparkle size={16} />
-                <span>24/7 Service</span>
-              </div>
-
               {/* Subtle reflection effect */}
               <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-white/5 to-transparent" />
             </div>

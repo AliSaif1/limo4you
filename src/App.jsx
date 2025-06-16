@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Services from './pages/Services';
 import Fleet from './pages/Fleet';
 import ScrollToTop from './components/ScrollToTop';
+import WhatsAppButton from './components/WhatsAppButton';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         </Routes>
       </div>
       <Footer />
+      <WhatsAppButton /> {/* Always visible */}
     </Router>
   );
 }
