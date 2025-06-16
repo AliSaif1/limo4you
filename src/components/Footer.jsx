@@ -2,9 +2,9 @@ const Footer = () => {
   return (
     <footer className="bg-primary text-white pt-16 pb-8">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Logo and Social */}
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          {/* Logo and Social - spans 3 columns */}
+          <div className="md:col-span-3 space-y-6">
             <div className="flex-shrink-0 -ml-9">
               <a href="/" className="inline-block">
                 <img
@@ -40,82 +40,114 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6 pb-2 border-b border-gray-700 inline-block">Quick Links</h3>
+          {/* Quick Links - spans 2 columns */}
+          <div className="md:col-span-2">
+            <h3 className="text-lg font-semibold mb-6 pb-2 border-b-2 border-secondary inline-block">Quick Links</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Home</span>
+              <li><a href="/" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                <span className="group-hover:translate-x-1 transition-transform">Home</span>
               </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Services</span>
+              <li><a href="services" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                <span className="group-hover:translate-x-1 transition-transform">Services</span>
               </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Fleet</span>
+              <li><a href="/fleet" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                <span className="group-hover:translate-x-1 transition-transform">Fleet</span>
               </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>About Us</span>
+              <li><a href="/about" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                <span className="group-hover:translate-x-1 transition-transform">About Us</span>
               </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Contact</span>
+              <li><a href="/contact" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                <span className="group-hover:translate-x-1 transition-transform">Contact</span>
               </a></li>
             </ul>
           </div>
 
-          {/* Services */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6 pb-2 border-b border-gray-700 inline-block">Services</h3>
-            <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Airport Transfers</span>
-              </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Weddings</span>
-              </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Corporate Events</span>
-              </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Night Out</span>
-              </a></li>
-              <li><a href="#" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start">
-                <span className="w-1 h-1 bg-secondary rounded-full mt-2 mr-2"></span>
-                <span>Special Occasions</span>
-              </a></li>
-            </ul>
+          {/* Services - spans 4 columns with two columns inside */}
+          <div className="md:col-span-4">
+            <h3 className="text-lg font-semibold mb-6 pb-2 border-b-2 border-secondary inline-block">Services</h3>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+              <ul className="space-y-3">
+                <li>
+                  <a href="/services/airport-transportation" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Airport Transfers</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/services/weddings" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Weddings</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/services/corporate-events" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Corporate Events</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/services/special-events" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Special Events</span>
+                  </a>
+                </li>
+              </ul>
+              <ul className="space-y-3">
+                <li>
+                  <a href="/services/bachelor-parties" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Bachelor Parties</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/services/sporting-events" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Sporting Events</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/services/graduations-proms" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Grad & Proms</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="/services/casino-trips" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+                    <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
+                    <span className="group-hover:translate-x-1 transition-transform">Casino Trips</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          {/* Contact Us */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6 pb-2 border-b border-gray-700 inline-block">Contact Us</h3>
+          {/* Contact Us - spans 3 columns */}
+          <div className="md:col-span-3">
+            <h3 className="text-lg font-semibold mb-6 pb-2 border-b-2 border-secondary inline-block">Contact Us</h3>
             <ul className="space-y-4 text-gray-300">
-              <li className="flex items-start">
-                <svg className="w-5 h-5 mt-0.5 mr-3 text-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li className="flex items-start group">
+                <svg className="w-5 h-5 mt-0.5 mr-3 text-secondary flex-shrink-0 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="leading-relaxed">123 Luxury Ave, Suite 100<br />Beverly Hills, CA 90210</span>
+                <span className="leading-relaxed group-hover:text-secondary transition-colors">123 Luxury Ave, Suite 100<br />Beverly Hills, CA 90210</span>
               </li>
-              <li className="flex items-center">
-                <svg className="w-5 h-5 mr-3 text-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li className="flex items-center group">
+                <svg className="w-5 h-5 mr-3 text-secondary flex-shrink-0 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <span>+1 (555) 123-4567</span>
+                <span className="group-hover:text-secondary transition-colors">+1 (555) 123-4567</span>
               </li>
-              <li className="flex items-center">
-                <svg className="w-5 h-5 mr-3 text-secondary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <li className="flex items-center group">
+                <svg className="w-5 h-5 mr-3 text-secondary flex-shrink-0 transform group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span>info@limo4you.net</span>
+                <span className="group-hover:text-secondary transition-colors">info@limo4All.ca</span>
               </li>
             </ul>
           </div>
@@ -127,9 +159,9 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} LIMO 4 ALL. All rights reserved.
           </p>
           <div className="flex space-x-6">
-            <a href="#" className="text-gray-400 hover:text-white text-sm transition">Privacy Policy</a>
-            <a href="#" className="text-gray-400 hover:text-white text-sm transition">Terms of Service</a>
-            <a href="#" className="text-gray-400 hover:text-white text-sm transition">Sitemap</a>
+            <a href="#" className="text-gray-400 hover:text-white text-sm transition hover:underline">Privacy Policy</a>
+            <a href="#" className="text-gray-400 hover:text-white text-sm transition hover:underline">Terms of Service</a>
+            <a href="#" className="text-gray-400 hover:text-white text-sm transition hover:underline">Sitemap</a>
           </div>
         </div>
       </div>
