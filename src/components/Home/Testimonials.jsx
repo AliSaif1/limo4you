@@ -56,31 +56,75 @@ const Testimonials = () => {
               itemScope
               itemType="https://schema.org/Review"
             >
-              {/* ✅ Item reviewed: LocalBusiness */}
+              {/* ✅ Item reviewed: Product (now includes review + aggregateRating inside) */}
               <div
                 itemProp="itemReviewed"
                 itemScope
-                itemType="https://schema.org/LocalBusiness"
+                itemType="https://schema.org/Product"
                 className="sr-only"
               >
-                <meta itemProp="name" content="Limo4All" />
-                <meta itemProp="telephone" content="+1-647-123-4567" />
-                <meta itemProp="priceRange" content="$$" />
-                <meta itemProp="image" content="https://www.limo4all.ca/logo.png" />
+                <meta
+                  itemProp="name"
+                  content={
+                    testimonial.id === 1
+                      ? "Executive Stretch Limousine"
+                      : testimonial.id === 2
+                        ? "Luxury Party Limousine"
+                        : "Luxury Sedan"
+                  }
+                />
+                <meta itemProp="description" content="Premium chauffeur-driven vehicle by Limo4All." />
+
+                {/* ✅ Add aggregateRating (for validation) */}
                 <div
-                  itemProp="address"
+                  itemProp="aggregateRating"
                   itemScope
-                  itemType="https://schema.org/PostalAddress"
+                  itemType="https://schema.org/AggregateRating"
                 >
-                  <meta itemProp="streetAddress" content="250 Front Street W" />
-                  <meta itemProp="addressLocality" content="Toronto" />
-                  <meta itemProp="addressRegion" content="ON" />
-                  <meta itemProp="postalCode" content="M5V 3G5" />
-                  <meta itemProp="addressCountry" content="CA" />
+                  <meta itemProp="ratingValue" content={testimonial.rating.toString()} />
+                  <meta itemProp="reviewCount" content="1" />
+                  <meta itemProp="bestRating" content="5" />
+                  <meta itemProp="worstRating" content="1" />
+                </div>
+
+                {/* ✅ Add single review (for validation) */}
+                <div itemProp="review" itemScope itemType="https://schema.org/Review">
+                  <meta itemProp="reviewBody" content={testimonial.content} />
+                  <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating">
+                    <meta itemProp="ratingValue" content={testimonial.rating.toString()} />
+                    <meta itemProp="bestRating" content="5" />
+                    <meta itemProp="worstRating" content="1" />
+                  </div>
+                  <div itemProp="author" itemScope itemType="https://schema.org/Person">
+                    <meta itemProp="name" content={testimonial.name} />
+                  </div>
+                </div>
+
+                {/* Brand Info */}
+                <div
+                  itemProp="brand"
+                  itemScope
+                  itemType="https://schema.org/LocalBusiness"
+                >
+                  <meta itemProp="name" content="Limo4All" />
+                  <meta itemProp="telephone" content="+1-647-123-4567" />
+                  <meta itemProp="priceRange" content="$$" />
+                  <meta itemProp="image" content="https://www.limo4all.ca/logo.png" />
+                  <div
+                    itemProp="address"
+                    itemScope
+                    itemType="https://schema.org/PostalAddress"
+                  >
+                    <meta itemProp="streetAddress" content="250 Front Street W" />
+                    <meta itemProp="addressLocality" content="Toronto" />
+                    <meta itemProp="addressRegion" content="ON" />
+                    <meta itemProp="postalCode" content="M5V 3G5" />
+                    <meta itemProp="addressCountry" content="CA" />
+                  </div>
                 </div>
               </div>
 
-              {/* ✅ Review Rating */}
+              {/* Existing visual review content */}
               <div
                 itemProp="reviewRating"
                 itemScope
@@ -93,9 +137,8 @@ const Testimonials = () => {
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-5 h-5 ${
-                      i < testimonial.rating ? "text-secondary" : "text-gray-600"
-                    }`}
+                    className={`w-5 h-5 ${i < testimonial.rating ? "text-secondary" : "text-gray-600"
+                      }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     aria-hidden="true"
@@ -105,7 +148,6 @@ const Testimonials = () => {
                 ))}
               </div>
 
-              {/* ✅ Review Content */}
               <blockquote className="mb-6 relative flex-grow">
                 <div className="absolute -top-4 -left-4 text-5xl text-secondary opacity-20 font-serif">
                   "
@@ -118,7 +160,6 @@ const Testimonials = () => {
                 </p>
               </blockquote>
 
-              {/* ✅ Review Author */}
               <div
                 className="border-t border-gray-700 pt-5 mt-auto"
                 itemProp="author"
