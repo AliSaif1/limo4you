@@ -30,10 +30,12 @@ const Testimonials = () => {
           <span className="inline-block py-1 px-3 mb-4 text-xs font-semibold bg-secondary text-primary-dark rounded-full tracking-wider">
             CLIENT TESTIMONIALS
           </span>
-          <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold mb-4">Trusted Luxury Transportation Experiences</h2>
+          <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold mb-4">
+            Trusted Luxury Transportation Experiences
+          </h2>
           <div className="w-20 h-1 bg-secondary mx-auto mb-6"></div>
           <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-            Rated 4.9/5 stars by our corporate and private clients worldwide
+            Rated 4.8/5 stars by our corporate and private clients in Tronto
           </p>
         </header>
 
@@ -45,6 +47,12 @@ const Testimonials = () => {
               itemScope
               itemType="https://schema.org/Review"
             >
+              {/* ✅ Item reviewed */}
+              <div itemProp="itemReviewed" itemScope itemType="https://schema.org/LocalBusiness">
+                <span itemProp="name" className="sr-only">Limo4All</span>
+              </div>
+
+              {/* ✅ Star rating */}
               <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating" className="flex mb-5">
                 <meta itemProp="ratingValue" content={testimonial.rating.toString()} />
                 <meta itemProp="bestRating" content="5" />
@@ -61,14 +69,23 @@ const Testimonials = () => {
                 ))}
               </div>
 
-              <blockquote className="mb-6 relative flex-grow" itemProp="reviewBody">
+              {/* ✅ Review body */}
+              <blockquote className="mb-6 relative flex-grow">
                 <div className="absolute -top-4 -left-4 text-5xl text-secondary opacity-20 font-serif">"</div>
-                <p className="relative z-10 text-base pl-4 italic">"{testimonial.content}"</p>
+                <p className="relative z-10 text-base pl-4 italic" itemProp="reviewBody">
+                  "{testimonial.content}"
+                </p>
               </blockquote>
 
-              <div className="border-t border-gray-700 pt-5 mt-auto">
-                <p className="font-bold" itemProp="author">{testimonial.name}</p>
-                <p className="text-gray-400 text-sm" itemProp="description">{testimonial.role}</p>
+              {/* ✅ Author object */}
+              <div
+                className="border-t border-gray-700 pt-5 mt-auto"
+                itemProp="author"
+                itemScope
+                itemType="https://schema.org/Person"
+              >
+                <span itemProp="name" className="font-bold">{testimonial.name}</span>
+                <span className="text-gray-400 text-sm block">{testimonial.role}</span>
               </div>
             </article>
           ))}
