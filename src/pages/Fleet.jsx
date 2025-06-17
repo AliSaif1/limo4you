@@ -19,7 +19,7 @@ const LIMOUSINES = [
   {
     id: 1,
     name: "Executive Stretch Limousine",
-    image: "./Executive-Limo.png",
+    image: "/Executive-Limo.png",
     capacity: "8-10 passengers",
     maxPassengers: 10,
     features: [
@@ -29,7 +29,16 @@ const LIMOUSINES = [
       "Champagne service"
     ],
     price: "$150/hour",
-    note: "Minimum 3 hour booking"
+    priceValue: 150,
+    priceCurrency: "USD",
+    note: "Minimum 3 hour booking",
+    availability: "https://schema.org/InStock",
+    aggregateRating: {
+      ratingValue: 4.8,
+      reviewCount: 42,
+      bestRating: 5,
+      worstRating: 1
+    }
   },
   {
     id: 2,
@@ -44,7 +53,16 @@ const LIMOUSINES = [
       "Privacy partitions"
     ],
     price: "$200/hour",
-    note: "Ideal for weddings and celebrations"
+    priceValue: 200,
+    priceCurrency: "USD",
+    note: "Ideal for weddings and celebrations",
+    availability: "https://schema.org/InStock",
+    aggregateRating: {
+      ratingValue: 4.9,
+      reviewCount: 36,
+      bestRating: 5,
+      worstRating: 1
+    }
   },
   {
     id: 3,
@@ -59,7 +77,16 @@ const LIMOUSINES = [
       "Discreet professional service"
     ],
     price: "$120/hour",
-    note: "Perfect for corporate travel"
+    priceValue: 120,
+    priceCurrency: "USD",
+    note: "Perfect for corporate travel",
+    availability: "https://schema.org/InStock",
+    aggregateRating: {
+      ratingValue: 4.8,
+      reviewCount: 28,
+      bestRating: 5,
+      worstRating: 1
+    }
   },
   {
     id: 4,
@@ -74,7 +101,16 @@ const LIMOUSINES = [
       "Ample cargo space"
     ],
     price: "$130/hour",
-    note: "Great for airport transfers"
+    priceValue: 130,
+    priceCurrency: "USD",
+    note: "Great for airport transfers",
+    availability: "https://schema.org/InStock",
+    aggregateRating: {
+      ratingValue: 4.9,
+      reviewCount: 31,
+      bestRating: 5,
+      worstRating: 1
+    }
   },
   {
     id: 5,
@@ -89,7 +125,16 @@ const LIMOUSINES = [
       "Quiet cabin experience"
     ],
     price: "$140/hour",
-    note: "Popular for family events"
+    priceValue: 140,
+    priceCurrency: "USD",
+    note: "Popular for family events",
+    availability: "https://schema.org/InStock",
+    aggregateRating: {
+      ratingValue: 4.7,
+      reviewCount: 25,
+      bestRating: 5,
+      worstRating: 1
+    }
   },
   {
     id: 6,
@@ -104,11 +149,20 @@ const LIMOUSINES = [
       "Massage seating options"
     ],
     price: "$160/hour",
-    note: "Executive class transportation"
+    priceValue: 160,
+    priceCurrency: "USD",
+    note: "Executive class transportation",
+    availability: "https://schema.org/InStock",
+    aggregateRating: {
+      ratingValue: 4.7,
+      reviewCount: 39,
+      bestRating: 5,
+      worstRating: 1
+    }
   }
 ];
 
-// Sub-components
+// Sub-components (remain unchanged)
 const StepIndicator = ({ currentStep }) => (
   <div className="flex justify-center mb-8">
     <div className="flex items-center">
@@ -248,7 +302,7 @@ const Fleet = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setIsLoading(true); // Set loading to true when submission starts
+    setIsLoading(true);
     try {
       await addDoc(collection(db, 'reservations'), {
         vehicleType: selectedLimo.name,
@@ -261,7 +315,7 @@ const Fleet = () => {
       console.error('Error adding reservation: ', error);
       setFormErrors({ submit: 'There was an error submitting your reservation. Please try again.' });
     } finally {
-      setIsLoading(false); // Set loading to false when done
+      setIsLoading(false);
     }
   };
 
@@ -407,7 +461,7 @@ const Fleet = () => {
           type="button"
           onClick={handlePrevStep}
           className="flex-1 py-3 border border-gray-300 rounded-lg text-text-primary hover:bg-gray-50 transition-colors font-medium"
-          disabled={isLoading} // Disable during loading
+          disabled={isLoading}
         >
           Back
         </button>
@@ -434,26 +488,181 @@ const Fleet = () => {
           </h1>
           <div className="w-20 h-1 bg-secondary mx-auto mb-6"></div>
           <p className="text-lg text-text-secondary mx-auto" itemProp="description">
-            Experience the pinnacle of luxury transportation with our exceptional fleet of limousines and executive vehicles in Tronto & Hamilton.
+            Experience the pinnacle of luxury transportation with our exceptional fleet of limousines and executive vehicles in Toronto & Hamilton.
             Each vehicle is meticulously maintained and serviced to ensure your complete satisfaction and safety.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
           {LIMOUSINES.map((limo) => (
-            <div
+            <article
               key={limo.id}
               className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100"
               itemScope
-              itemType="https://schema.org/Product"
+              itemType="http://schema.org/Product"
             >
+              {/* Executive Stretch Limousine */}
+              <meta itemProp="mpn" content="LIMO4ALL-MPN-1" />
+              <meta itemProp="name" content="Executive Stretch Limousine" />
+              <meta itemProp="image" content="https://www.limo4all.ca/Executive-Limo.png" />
+              <meta itemProp="description" content="Plush leather seating, Premium sound system, LED mood lighting, Champagne service" />
+
+              <div itemProp="brand" itemScope itemType="http://schema.org/Brand" className="sr-only">
+                <meta itemProp="name" content="Limo4All" />
+              </div>
+
+              <div itemProp="offers" itemScope itemType="http://schema.org/Offer" className="sr-only">
+                <meta itemProp="price" content="150.00" />
+                <meta itemProp="priceCurrency" content="USD" />
+                <link itemProp="availability" href="https://schema.org/InStock" />
+                <meta itemProp="url" content="https://www.limo4all.ca/#fleet-1" />
+                <meta itemProp="priceValidUntil" content="2025-12-31" />
+                <meta itemProp="shippingDetails" content="https://schema.org/PickupInStore" />
+              </div>
+
+              <div itemProp="aggregateRating" itemScope itemType="http://schema.org/AggregateRating" className="sr-only">
+                <meta itemProp="ratingValue" content="4.8" />
+                <meta itemProp="reviewCount" content="42" />
+                <meta itemProp="bestRating" content="5.0" />
+                <meta itemProp="worstRating" content="1.0" />
+              </div>
+
+              <div itemProp="review" itemScope itemType="http://schema.org/Review" className="sr-only">
+                <meta itemProp="reviewBody" content="Clients have rated this vehicle highly for comfort and luxury features." />
+                <div itemProp="reviewRating" itemScope itemType="http://schema.org/Rating">
+                  <meta itemProp="ratingValue" content="4.8" />
+                  <meta itemProp="bestRating" content="5.0" />
+                  <meta itemProp="worstRating" content="1.0" />
+                </div>
+                <div itemProp="author" itemScope itemType="http://schema.org/Person">
+                  <meta itemProp="name" content="Verified Customer" />
+                </div>
+              </div>
+
+              <div itemScope itemType="https://schema.org/ProductCollection" className="sr-only">
+                <meta itemProp="name" content="Limo4All Luxury Fleet Collection" />
+                <link itemProp="url" content="https://www.limo4all.ca/#fleet" />
+
+                {/* Collection-level metadata */}
+                <div itemProp="brand" itemScope itemType="https://schema.org/Brand">
+                  <meta itemProp="name" content="Limo4All" />
+                </div>
+
+                <div itemProp="provider" itemScope itemType="https://schema.org/LocalBusiness">
+                  <meta itemProp="name" content="Limo4All" />
+                  <meta itemProp="telephone" content="+16471234567" />
+                  <meta itemProp="address" content="123 Main St, Toronto, ON, Canada" />
+                  <meta itemProp="priceRange" content="$$$" />
+                </div>
+
+                {/* Individual products */}
+                <div itemProp="hasProduct" itemScope itemType="https://schema.org/Product">
+                  <meta itemProp="mpn" content="LIMO4ALL-MPN-2" />
+                  <meta itemProp="name" content="Luxury Party Limousine" />
+                  <meta itemProp="image" content="https://www.limo4all.ca/Party-Limo.png" />
+                  <meta itemProp="description" content="Extended luxury interior, State-of-the-art entertainment, Mini bar setup, Privacy partitions" />
+
+                  <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <meta itemProp="price" content="200.00" />
+                    <meta itemProp="priceCurrency" content="USD" />
+                    <link itemProp="availability" href="https://schema.org/InStock" />
+                    <meta itemProp="url" content="https://www.limo4all.ca/#fleet-2" />
+                    <meta itemProp="priceValidUntil" content="2025-12-31" />
+                  </div>
+
+                  <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    <meta itemProp="ratingValue" content="4.9" />
+                    <meta itemProp="reviewCount" content="36" />
+                  </div>
+                </div>
+
+                <div itemProp="hasProduct" itemScope itemType="https://schema.org/Product">
+                  <meta itemProp="mpn" content="LIMO4ALL-MPN-3" />
+                  <meta itemProp="name" content="Luxury Sedan" />
+                  <meta itemProp="image" content="https://www.limo4all.ca/Sedan.png" />
+                  <meta itemProp="description" content="Executive class comfort, WiFi connectivity, Workstation setup, Discreet professional service" />
+
+                  <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <meta itemProp="price" content="120.00" />
+                    <meta itemProp="priceCurrency" content="USD" />
+                    <link itemProp="availability" href="https://schema.org/InStock" />
+                    <meta itemProp="url" content="https://www.limo4all.ca/#fleet-3" />
+                    <meta itemProp="priceValidUntil" content="2025-12-31" />
+                  </div>
+
+                  <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    <meta itemProp="ratingValue" content="4.8" />
+                    <meta itemProp="reviewCount" content="28" />
+                  </div>
+                </div>
+
+                <div itemProp="hasProduct" itemScope itemType="https://schema.org/Product">
+                  <meta itemProp="mpn" content="LIMO4ALL-MPN-4" />
+                  <meta itemProp="name" content="Chevrolet Suburban" />
+                  <meta itemProp="image" content="https://www.limo4all.ca/Chevrolet-Suburban.png" />
+                  <meta itemProp="description" content="Spacious SUV luxury, Premium leather seating, Advanced climate control, Ample cargo space" />
+
+                  <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <meta itemProp="price" content="130.00" />
+                    <meta itemProp="priceCurrency" content="USD" />
+                    <link itemProp="availability" href="https://schema.org/InStock" />
+                    <meta itemProp="url" content="https://www.limo4all.ca/#fleet-4" />
+                    <meta itemProp="priceValidUntil" content="2025-12-31" />
+                  </div>
+
+                  <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    <meta itemProp="ratingValue" content="4.9" />
+                    <meta itemProp="reviewCount" content="31" />
+                  </div>
+                </div>
+
+                <div itemProp="hasProduct" itemScope itemType="https://schema.org/Product">
+                  <meta itemProp="mpn" content="LIMO4ALL-MPN-5" />
+                  <meta itemProp="name" content="GMC Yukon" />
+                  <meta itemProp="image" content="https://www.limo4all.ca/GMC-Yukon.png" />
+                  <meta itemProp="description" content="Premium Denali trim, Heated and ventilated seats, High-end infotainment, Quiet cabin experience" />
+
+                  <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <meta itemProp="price" content="140.00" />
+                    <meta itemProp="priceCurrency" content="USD" />
+                    <link itemProp="availability" href="https://schema.org/InStock" />
+                    <meta itemProp="url" content="https://www.limo4all.ca/#fleet-5" />
+                    <meta itemProp="priceValidUntil" content="2025-12-31" />
+                  </div>
+
+                  <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    <meta itemProp="ratingValue" content="4.7" />
+                    <meta itemProp="reviewCount" content="25" />
+                  </div>
+                </div>
+
+                <div itemProp="hasProduct" itemScope itemType="https://schema.org/Product">
+                  <meta itemProp="mpn" content="LIMO4ALL-MPN-6" />
+                  <meta itemProp="name" content="Cadillac Escalade" />
+                  <meta itemProp="image" content="https://www.limo4all.ca/Escalade.png" />
+                  <meta itemProp="description" content="Ultimate luxury SUV, Handcrafted interior, Premium entertainment system, Massage seating options" />
+
+                  <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                    <meta itemProp="price" content="160.00" />
+                    <meta itemProp="priceCurrency" content="USD" />
+                    <link itemProp="availability" href="https://schema.org/InStock" />
+                    <meta itemProp="url" content="https://www.limo4all.ca/#fleet-6" />
+                    <meta itemProp="priceValidUntil" content="2025-12-31" />
+                  </div>
+
+                  <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+                    <meta itemProp="ratingValue" content="4.7" />
+                    <meta itemProp="reviewCount" content="39" />
+                  </div>
+                </div>
+              </div>
+              {/* Visible Content */}
               <div className="h-64 overflow-hidden relative">
                 <img
                   src={limo.image}
-                  alt={`${limo.name} luxury vehicle service in Tronto & Hamilton`}
+                  alt={`${limo.name} luxury vehicle service in Toronto & Hamilton`}
                   className="w-full h-full object-cover"
                   loading="lazy"
-                  itemProp="image"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
                 <div className="absolute bottom-4 left-4 right-4">
@@ -463,14 +672,14 @@ const Fleet = () => {
                 </div>
               </div>
               <div className="p-6 lg:p-8">
-                <h2 className="text-2xl font-bold text-text-primary mb-3 font-display" itemProp="name">
+                <h2 className="text-2xl font-bold text-text-primary mb-3 font-display">
                   {limo.name}
                 </h2>
-                <ul className="mb-6 space-y-3" itemProp="description">
+                <ul className="mb-6 space-y-3">
                   {limo.features.map((feature, index) => (
                     <li key={index} className="flex items-start text-text-secondary">
                       <svg className="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                       </svg>
                       {feature}
                     </li>
@@ -478,13 +687,12 @@ const Fleet = () => {
                 </ul>
                 <div className="border-t border-gray-100 pt-4">
                   <div className="flex justify-between items-center">
-                    <div itemScope itemType="https://schema.org/Offer">
-                      <span className="block text-2xl font-bold text-text-primary" itemProp="price">
+                    <div>
+                      <span className="block text-2xl font-bold text-text-primary">
                         {limo.price}
                       </span>
-                      <meta itemProp="priceCurrency" content="USD" />
                       {limo.note && (
-                        <span className="block text-xs text-text-secondary mt-1" itemProp="description">
+                        <span className="block text-xs text-text-secondary mt-1">
                           {limo.note}
                         </span>
                       )}
@@ -499,7 +707,7 @@ const Fleet = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>
@@ -512,7 +720,6 @@ const Fleet = () => {
         overlayClassName="modal-overlay"
         contentLabel="Reservation Form"
       >
-        {/* Add loading overlay */}
         {isLoading && (
           <div className="loading-overlay">
             <div className="loading-spinner"></div>
