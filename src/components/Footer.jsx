@@ -48,7 +48,7 @@ const Footer = () => {
                 <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
                 <span className="group-hover:translate-x-1 transition-transform">Home</span>
               </a></li>
-              <li><a href="services" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
+              <li><a href="/services" className="text-gray-300 hover:text-secondary transition duration-200 flex items-start group">
                 <span className="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 transform group-hover:scale-125 transition-transform"></span>
                 <span className="group-hover:translate-x-1 transition-transform">Services</span>
               </a></li>
