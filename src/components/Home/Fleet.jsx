@@ -20,7 +20,7 @@ const LIMOUSINES = [
   {
     id: 1,
     name: "Executive Stretch Limousine",
-    image: "./Executive-Limo.png",
+    image: "https://www.limo4all.ca/Executive-Limo.png",
     capacity: "8-10 passengers",
     maxPassengers: 10,
     features: [
@@ -29,13 +29,17 @@ const LIMOUSINES = [
       "LED mood lighting",
       "Champagne service"
     ],
-    price: "$150/hour",
-    note: "Minimum 3 hour booking"
+    price: 150,
+    priceCurrency: "USD",
+    note: "Minimum 3 hour booking",
+    availability: "InStock",
+    url: "https://www.limo4all.ca/fleet#executive-stretch",
+    priceValidUntil: "2025-12-31"
   },
   {
     id: 2,
     name: "Luxury Party Limousine",
-    image: "./Party-Limo.png",
+    image: "https://www.limo4all.ca/Party-Limo.png",
     capacity: "12-14 passengers",
     maxPassengers: 14,
     features: [
@@ -44,13 +48,17 @@ const LIMOUSINES = [
       "Mini bar setup",
       "Privacy partitions"
     ],
-    price: "$200/hour",
-    note: "Ideal for weddings and celebrations"
+    price: 200,
+    priceCurrency: "USD",
+    note: "Ideal for weddings and celebrations",
+    availability: "InStock",
+    url: "https://www.limo4all.ca/fleet#party-limo",
+    priceValidUntil: "2025-12-31"
   },
   {
     id: 3,
     name: "Luxury Sedan",
-    image: "./Sedan.png",
+    image: "https://www.limo4all.ca/Sedan.png",
     capacity: "3 passengers",
     maxPassengers: 3,
     features: [
@@ -59,12 +67,15 @@ const LIMOUSINES = [
       "Workstation setup",
       "Discreet professional service"
     ],
-    price: "$120/hour",
-    note: "Perfect for corporate travel"
+    price: 120,
+    priceCurrency: "USD",
+    note: "Perfect for corporate travel",
+    availability: "InStock",
+    url: "https://www.limo4all.ca/fleet#luxury-sedan",
+    priceValidUntil: "2025-12-31"
   }
 ];
 
-// Sub-components
 const StepIndicator = ({ currentStep }) => (
   <div className="flex justify-center mb-8">
     <div className="flex items-center">
@@ -106,7 +117,7 @@ const ReservationSummary = ({ selectedLimo, formData }) => (
     <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
       <div className="flex justify-between border-b border-gray-200 pb-2 mb-2">
         <p className="font-medium">{selectedLimo?.name}</p>
-        <p className="text-sm text-text-secondary">{selectedLimo?.price}</p>
+        <p className="text-sm text-text-secondary">${selectedLimo?.price}/hour</p>
       </div>
       <div className="space-y-1 text-sm">
         <p><span className="font-medium text-text-primary">Capacity:</span> {selectedLimo?.capacity}</p>
@@ -207,7 +218,7 @@ const Fleet = () => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    setIsLoading(true); // Set loading to true when submission starts
+    setIsLoading(true);
     try {
       await addDoc(collection(db, 'reservations'), {
         vehicleType: selectedLimo.name,
@@ -220,7 +231,7 @@ const Fleet = () => {
       console.error('Error adding reservation: ', error);
       setFormErrors({ submit: 'There was an error submitting your reservation. Please try again.' });
     } finally {
-      setIsLoading(false); // Set loading to false when done
+      setIsLoading(false);
     }
   };
 
@@ -366,7 +377,7 @@ const Fleet = () => {
           type="button"
           onClick={handlePrevStep}
           className="flex-1 py-3 border border-gray-300 rounded-lg text-text-primary hover:bg-gray-50 transition-colors font-medium"
-          disabled={isLoading} // Disable during loading
+          disabled={isLoading}
         >
           Back
         </button>
@@ -382,7 +393,16 @@ const Fleet = () => {
   );
 
   return (
-    <section className="py-20 bg-background mt-6" id="fleet" itemScope itemType="https://schema.org/ProductCollection">
+    <section
+      className="py-20 bg-background mt-6"
+      id="fleet"
+      itemScope
+      itemType="https://schema.org/ProductCollection"
+    >
+      <meta itemProp="name" content="Limo4All Luxury Fleet Collection" />
+      <meta itemProp="description" content="Premium fleet of luxury limousines and executive vehicles in Toronto & Hamilton" />
+      <link itemProp="url" content="https://www.limo4all.ca/fleet" />
+
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16 max-w-4xl mx-auto">
           <span className="inline-block bg-primary text-white px-5 py-2 rounded-full text-xs font-semibold tracking-wider uppercase mb-6">
@@ -393,7 +413,7 @@ const Fleet = () => {
           </h1>
           <div className="w-20 h-1 bg-secondary mx-auto mb-6"></div>
           <p className="text-lg text-text-secondary mx-auto" itemProp="description">
-            Experience the pinnacle of luxury transportation with our exceptional fleet of limousines and executive vehicles in Tronto & Hamilton.
+            Experience the pinnacle of luxury transportation with our exceptional fleet of limousines and executive vehicles in Toronto & Hamilton.
             Each vehicle is meticulously maintained and serviced to ensure your complete satisfaction and safety.
           </p>
         </div>
@@ -409,7 +429,7 @@ const Fleet = () => {
               <div className="h-64 overflow-hidden relative">
                 <img
                   src={limo.image}
-                  alt={`${limo.name} luxury vehicle service in Tronto & Hamilton`}
+                  alt={`${limo.name} luxury vehicle service in Toronto & Hamilton`}
                   className="w-full h-full object-cover"
                   loading="lazy"
                   itemProp="image"
@@ -425,23 +445,29 @@ const Fleet = () => {
                 <h2 className="text-2xl font-bold text-text-primary mb-3 font-display" itemProp="name">
                   {limo.name}
                 </h2>
-                <ul className="mb-6 space-y-3" itemProp="description">
-                  {limo.features.map((feature, index) => (
-                    <li key={index} className="flex items-start text-text-secondary">
-                      <svg className="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
+                <div itemProp="description">
+                  <ul className="mb-6 space-y-3">
+                    {limo.features.map((feature, index) => (
+                      <li key={index} className="flex items-start text-text-secondary">
+                        <svg className="w-5 h-5 text-secondary mr-2 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
                 <div className="border-t border-gray-100 pt-4">
                   <div className="flex justify-between items-center">
-                    <div itemScope itemType="https://schema.org/Offer">
-                      <span className="block text-2xl font-bold text-text-primary" itemProp="price">
-                        {limo.price}
+                    <div itemScope itemType="https://schema.org/Offer" itemProp="offers">
+                      <meta itemProp="priceCurrency" content={limo.priceCurrency} />
+                      <meta itemProp="price" content={limo.price} />
+                      <meta itemProp="priceValidUntil" content={limo.priceValidUntil} />
+                      <link itemProp="availability" href={`https://schema.org/${limo.availability}`} />
+                      <link itemProp="url" content={limo.url} />
+                      <span className="block text-2xl font-bold text-text-primary">
+                        ${limo.price}/hour
                       </span>
-                      <meta itemProp="priceCurrency" content="USD" />
                       {limo.note && (
                         <span className="block text-xs text-text-secondary mt-1" itemProp="description">
                           {limo.note}
@@ -481,7 +507,6 @@ const Fleet = () => {
         overlayClassName="modal-overlay"
         contentLabel="Reservation Form"
       >
-        {/* Add loading overlay */}
         {isLoading && (
           <div className="loading-overlay">
             <div className="loading-spinner"></div>
