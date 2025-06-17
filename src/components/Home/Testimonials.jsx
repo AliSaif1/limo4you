@@ -3,39 +3,48 @@ const testimonials = [
     id: 1,
     name: "Sarah Johnson",
     role: "Corporate Client",
-    content: "The service was impeccable. The driver was professional and arrived 10 minutes early. Will definitely use again for our executives.",
+    content:
+      "The service was impeccable. The driver was professional and arrived 10 minutes early. Will definitely use again for our executives.",
     rating: 5,
   },
   {
     id: 2,
     name: "Michael Chen",
     role: "Wedding Client",
-    content: "Made our wedding day transportation seamless. The stretch limo was pristine and the driver went above and beyond.",
+    content:
+      "Made our wedding day transportation seamless. The stretch limo was pristine and the driver went above and beyond.",
     rating: 5,
   },
   {
     id: 3,
     name: "Emily Rodriguez",
     role: "Airport Transfer",
-    content: "Perfect for my business trips. Always reliable and the WiFi in the car helps me stay productive.",
+    content:
+      "Perfect for my business trips. Always reliable and the WiFi in the car helps me stay productive.",
     rating: 4,
   },
 ];
 
 const Testimonials = () => {
   return (
-    <section aria-labelledby="testimonials-heading" className="py-16 bg-primary text-white">
+    <section
+      aria-labelledby="testimonials-heading"
+      className="py-16 bg-primary text-white"
+    >
       <div className="container mx-auto px-4">
         <header className="text-center mb-12">
           <span className="inline-block py-1 px-3 mb-4 text-xs font-semibold bg-secondary text-primary-dark rounded-full tracking-wider">
             CLIENT TESTIMONIALS
           </span>
-          <h2 id="testimonials-heading" className="text-3xl md:text-4xl font-bold mb-4">
+          <h2
+            id="testimonials-heading"
+            className="text-3xl md:text-4xl font-bold mb-4"
+          >
             Trusted Luxury Transportation Experiences
           </h2>
           <div className="w-20 h-1 bg-secondary mx-auto mb-6"></div>
           <p className="text-gray-300 max-w-2xl mx-auto text-lg">
-            Rated 4.8/5 stars by our corporate and private clients in Tronto
+            Rated 4.8/5 stars by our corporate and private clients in Toronto
           </p>
         </header>
 
@@ -47,19 +56,46 @@ const Testimonials = () => {
               itemScope
               itemType="https://schema.org/Review"
             >
-              {/* ✅ Item reviewed */}
-              <div itemProp="itemReviewed" itemScope itemType="https://schema.org/LocalBusiness">
-                <span itemProp="name" className="sr-only">Limo4All</span>
+              {/* ✅ Item reviewed: LocalBusiness */}
+              <div
+                itemProp="itemReviewed"
+                itemScope
+                itemType="https://schema.org/LocalBusiness"
+                className="sr-only"
+              >
+                <meta itemProp="name" content="Limo4All" />
+                <meta itemProp="telephone" content="+1-647-123-4567" />
+                <meta itemProp="priceRange" content="$$" />
+                <meta itemProp="image" content="https://www.limo4all.ca/logo.png" />
+                <div
+                  itemProp="address"
+                  itemScope
+                  itemType="https://schema.org/PostalAddress"
+                >
+                  <meta itemProp="streetAddress" content="250 Front Street W" />
+                  <meta itemProp="addressLocality" content="Toronto" />
+                  <meta itemProp="addressRegion" content="ON" />
+                  <meta itemProp="postalCode" content="M5V 3G5" />
+                  <meta itemProp="addressCountry" content="CA" />
+                </div>
               </div>
 
-              {/* ✅ Star rating */}
-              <div itemProp="reviewRating" itemScope itemType="https://schema.org/Rating" className="flex mb-5">
+              {/* ✅ Review Rating */}
+              <div
+                itemProp="reviewRating"
+                itemScope
+                itemType="https://schema.org/Rating"
+                className="flex mb-5"
+              >
                 <meta itemProp="ratingValue" content={testimonial.rating.toString()} />
                 <meta itemProp="bestRating" content="5" />
+                <meta itemProp="worstRating" content="1" />
                 {[...Array(5)].map((_, i) => (
                   <svg
                     key={i}
-                    className={`w-5 h-5 ${i < testimonial.rating ? 'text-secondary' : 'text-gray-600'}`}
+                    className={`w-5 h-5 ${
+                      i < testimonial.rating ? "text-secondary" : "text-gray-600"
+                    }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
                     aria-hidden="true"
@@ -69,23 +105,32 @@ const Testimonials = () => {
                 ))}
               </div>
 
-              {/* ✅ Review body */}
+              {/* ✅ Review Content */}
               <blockquote className="mb-6 relative flex-grow">
-                <div className="absolute -top-4 -left-4 text-5xl text-secondary opacity-20 font-serif">"</div>
-                <p className="relative z-10 text-base pl-4 italic" itemProp="reviewBody">
+                <div className="absolute -top-4 -left-4 text-5xl text-secondary opacity-20 font-serif">
+                  "
+                </div>
+                <p
+                  className="relative z-10 text-base pl-4 italic"
+                  itemProp="reviewBody"
+                >
                   "{testimonial.content}"
                 </p>
               </blockquote>
 
-              {/* ✅ Author object */}
+              {/* ✅ Review Author */}
               <div
                 className="border-t border-gray-700 pt-5 mt-auto"
                 itemProp="author"
                 itemScope
                 itemType="https://schema.org/Person"
               >
-                <span itemProp="name" className="font-bold">{testimonial.name}</span>
-                <span className="text-gray-400 text-sm block">{testimonial.role}</span>
+                <span itemProp="name" className="font-bold">
+                  {testimonial.name}
+                </span>
+                <span className="text-gray-400 text-sm block">
+                  {testimonial.role}
+                </span>
               </div>
             </article>
           ))}
