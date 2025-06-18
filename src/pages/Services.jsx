@@ -106,10 +106,32 @@ const Services = () => {
             ),
             url: "casino-trips"
         }
-    ];
+    ]
 
     return (
         <section className="py-16 bg-gray-50 mt-20">
+            {/* Service Collection Schema */}
+            <div itemScope itemType="http://schema.org/ServiceCollection" className="sr-only">
+                <meta itemProp="name" content="Limo4All Premium Services Collection" />
+                <link itemProp="url" content="https://www.limo4all.ca/services" />
+                <meta itemProp="image" content="https://www.limo4all.ca/luxury-interior.png" />
+
+                <div itemProp="provider" itemScope itemType="http://schema.org/LocalBusiness">
+                    <meta itemProp="name" content="Limo4All" />
+                    <meta itemProp="telephone" content="+16471234567" />
+                    <meta itemProp="image" content="https://www.limo4all.ca/logo.png" />
+                    <div itemProp="address" itemScope itemType="http://schema.org/PostalAddress">
+                        <meta itemProp="streetAddress" content="123 Main St" />
+                        <meta itemProp="addressLocality" content="Toronto" />
+                        <meta itemProp="addressRegion" content="ON" />
+                        <meta itemProp="postalCode" content="M1M 1M1" />
+                        <meta itemProp="addressCountry" content="CA" />
+                    </div>
+                    <meta itemProp="priceRange" content="$$$" />
+                </div>
+            </div>
+
+            {/* Visible content */}
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <header className="text-center mb-16">
                     <div className="text-center mb-12">
@@ -132,20 +154,50 @@ const Services = () => {
                         <article
                             key={service.id}
                             className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-gray-100 flex flex-col"
+                            itemScope
+                            itemType="http://schema.org/Service"
                         >
+                            {/* Service-specific schema */}
+                            <meta itemProp="name" content={`Limo4All ${service.title}`} />
+                            <meta itemProp="description" content={service.description} />
+                            <link itemProp="url" content={`https://www.limo4all.ca/services/${service.url}`} />
+
+                            <div itemProp="provider" itemScope itemType="http://schema.org/LocalBusiness" className="sr-only">
+                                <meta itemProp="name" content="Limo4All" />
+                                <meta itemProp="telephone" content="+16471234567" />
+                                <meta itemProp="priceRange" content="$$$" />
+                                <meta itemProp="image" content="https://www.limo4all.ca/logo.png" />
+
+                                <div itemProp="address" itemScope itemType="http://schema.org/PostalAddress">
+                                    <meta itemProp="streetAddress" content="123 Main St" />
+                                    <meta itemProp="addressLocality" content="Toronto" />
+                                    <meta itemProp="addressRegion" content="ON" />
+                                    <meta itemProp="postalCode" content="M1M 1M1" />
+                                    <meta itemProp="addressCountry" content="CA" />
+                                </div>
+                            </div>
+
+                            <div itemProp="offers" itemScope itemType="http://schema.org/Offer" className="sr-only">
+                                <meta itemProp="priceCurrency" content="USD" />
+                                <link itemProp="availability" href="https://schema.org/InStock" />
+                                <meta itemProp="priceValidUntil" content="2025-12-31" />
+                            </div>
+
+                            {/* Visible content */}
                             <div className="p-6 flex-grow">
                                 <div className="w-12 h-12 flex items-center justify-center rounded-full bg-primary-50 text-primary-600 mb-4">
                                     {service.icon}
                                 </div>
-                                <h2 className="text-xl font-bold text-gray-900 mb-3">
+                                <h2 className="text-xl font-bold text-gray-900 mb-3" itemProp="name">
                                     {service.title}
                                 </h2>
-                                <p className="text-gray-600 mb-6">
+                                <p className="text-gray-600 mb-6" itemProp="description">
                                     {service.description}
                                 </p>
                                 <Link
                                     to={`/services/${service.url}`}
                                     className="text-sm font-medium text-primary hover:text-primary-700 inline-flex items-center group/link"
+                                    itemProp="url"
                                 >
                                     Learn more
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 transform group-hover/link:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
@@ -155,15 +207,6 @@ const Services = () => {
                             </div>
                         </article>
                     ))}
-                </div>
-
-                <div className="mt-12 text-center">
-                    <Link
-                        to="/contact"
-                        className="inline-block bg-primary hover:bg-primary-700 text-white font-medium py-3 px-8 rounded-full transition-colors duration-300"
-                    >
-                        Book Your Limousine
-                    </Link>
                 </div>
             </div>
         </section>

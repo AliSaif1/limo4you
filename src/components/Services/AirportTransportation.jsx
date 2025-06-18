@@ -1,76 +1,268 @@
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const AirportTransportation = () => {
     return (
-        <section className="py-16 bg-white mt-20">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="text-center mb-16">
-                    <div className="w-24 h-24 mx-auto bg-primary-50 rounded-full flex items-center justify-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+        <>
+            <Helmet>
+                <title>Premium Airport Transportation in Toronto & Hamilton | Limo4All</title>
+                <meta name="description" content="Reliable luxury airport transfers to Pearson (YYZ), Billy Bishop (YTZ), and Hamilton (YHM) airports. 24/7 service with flight monitoring." />
+                <meta property="og:title" content="Premium Airport Transportation in Toronto & Hamilton | Limo4All" />
+                <meta property="og:description" content="Reliable luxury airport transfers to Pearson (YYZ), Billy Bishop (YTZ), and Hamilton (YHM) airports. 24/7 service with flight monitoring." />
+                <meta property="og:url" content="https://www.limo4all.ca/services/airport-transportation" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.limo4all.ca/services/airport-transportation" />
+            </Helmet>
+
+            {/* Microdata Structured Data */}
+            <div itemScope itemType="http://schema.org/Service" className="sr-only">
+                <meta itemProp="name" content="Premium Airport Transportation in Toronto & Hamilton" />
+                <meta itemProp="description" content="Reliable luxury airport transfers to Pearson (YYZ), Billy Bishop (YTZ), and Hamilton (YHM) airports. 24/7 service with flight monitoring and meet & greet." />
+                <link itemProp="url" content="https://www.limo4all.ca/services/airport-transportation" />
+                <meta itemProp="serviceType" content="Airport Transportation" />
+
+                <div itemProp="provider" itemScope itemType="http://schema.org/LocalBusiness">
+                    <meta itemProp="name" content="Limo4All" />
+                    <meta itemProp="telephone" content="+16471234567" />
+                    <meta itemProp="image" content="https://www.limo4all.ca/logo.png" />
+                    <div itemProp="address" itemScope itemType="http://schema.org/PostalAddress">
+                        <meta itemProp="streetAddress" content="123 Main St" />
+                        <meta itemProp="addressLocality" content="Toronto" />
+                        <meta itemProp="addressRegion" content="ON" />
+                        <meta itemProp="postalCode" content="M5V 3L9" />
+                        <meta itemProp="addressCountry" content="CA" />
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                        Airport Transportation
-                    </h1>
-                    <div className="w-16 h-1 bg-primary mx-auto mb-6"></div>
-                    <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                        Premium airport transfers with flight monitoring and meet & greet services.
-                    </p>
+                    <meta itemProp="priceRange" content="$$$" />
+
+                    <div itemProp="geo" itemScope itemType="http://schema.org/GeoCoordinates">
+                        <meta itemProp="latitude" content="43.6532" />
+                        <meta itemProp="longitude" content="-79.3832" />
+                    </div>
+
+                    <div itemProp="openingHoursSpecification" itemScope itemType="http://schema.org/OpeningHoursSpecification">
+                        <meta itemProp="dayOfWeek" content="Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday" />
+                        <meta itemProp="opens" content="00:00" />
+                        <meta itemProp="closes" content="23:59" />
+                    </div>
+
+                    <div itemProp="areaServed" itemScope itemType="http://schema.org/City">
+                        <meta itemProp="name" content="Toronto" />
+                    </div>
+                    <div itemProp="areaServed" itemScope itemType="http://schema.org/City">
+                        <meta itemProp="name" content="Hamilton" />
+                    </div>
                 </div>
 
-                <div className="max-w-4xl mx-auto">
-                    <div className="prose prose-lg mx-auto mb-12">
-                        <p>Our professional airport transportation service ensures punctual arrivals and departures with real-time flight tracking. Enjoy complimentary amenities including bottled water, phone chargers, and WiFi. Available 24/7 with options for executive sedans or luxury SUVs.</p>
+                <div itemProp="hasOfferCatalog" itemScope itemType="http://schema.org/OfferCatalog">
+                    <meta itemProp="name" content="Airport Transportation Services" />
+                    <div itemProp="itemListElement" itemScope itemType="http://schema.org/Offer">
+                        <div itemProp="itemOffered" itemScope itemType="http://schema.org/Service">
+                            <meta itemProp="name" content="Pearson Airport Transfer" />
+                            <meta itemProp="description" content="Luxury transportation to Toronto Pearson International Airport (YYZ)" />
+                        </div>
                     </div>
-
-                    <div className="bg-gray-50 p-8 rounded-xl mb-12">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Service Features</h2>
-                        <ul className="grid md:grid-cols-2 gap-4">
-                            <li className="flex items-start">
-                                <svg className="h-6 w-6 text-primary mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span className="text-gray-700">Real-time flight tracking</span>
-                            </li>
-                            <li className="flex items-start">
-                                <svg className="h-6 w-6 text-primary mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span className="text-gray-700">Meet & greet service</span>
-                            </li>
-                            <li className="flex items-start">
-                                <svg className="h-6 w-6 text-primary mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span className="text-gray-700">24/7 availability</span>
-                            </li>
-                            <li className="flex items-start">
-                                <svg className="h-6 w-6 text-primary mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span className="text-gray-700">Complimentary WiFi and amenities</span>
-                            </li>
-                            <li className="flex items-start">
-                                <svg className="h-6 w-6 text-primary mr-3 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span className="text-gray-700">Professional chauffeurs</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div className="text-center">
-                        <Link
-                            to="/contact"
-                            className="inline-block bg-primary hover:bg-primary-700 text-white font-medium py-3 px-8 rounded-full transition-colors duration-300"
-                        >
-                            Book Airport Transportation
-                        </Link>
+                    <div itemProp="itemListElement" itemScope itemType="http://schema.org/Offer">
+                        <div itemProp="itemOffered" itemScope itemType="http://schema.org/Service">
+                            <meta itemProp="name" content="Billy Bishop Airport Transfer" />
+                            <meta itemProp="description" content="Executive service to Billy Bishop Toronto City Airport (YTZ)" />
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
+
+            {/* Sticky Booking Button */}
+            <div className="fixed bottom-6 left-6 z-50">
+                <Link
+                    to="/contact"
+                    className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
+                    aria-label="Book Corporate Transportation"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Book Now
+                </Link>
+            </div>
+
+            {/* Page Content */}
+            <section className="py-16 bg-white mt-2">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Hero Section with Booking Button */}
+                    <div className="relative bg-gradient-to-r from-primary to-secondary rounded-xl p-8 mb-16 text-white">
+                        <div className="max-w-2xl mx-auto text-center">
+                            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                                Premium Airport Transfers in <span className="text-white">Toronto & Hamilton</span>
+                            </h1>
+                            <p className="text-lg mb-8">
+                                Stress-free luxury transportation to all major airports with real-time flight tracking
+                            </p>
+                            <div className="flex flex-col sm:flex-row justify-center gap-4">
+                                <Link
+                                    to="/contact"
+                                    className="bg-white hover:bg-gray-100 text-primary font-bold py-3 px-8 rounded-full transition-colors duration-300"
+                                    aria-label="Book Airport Transfer Now"
+                                >
+                                    Book Now
+                                </Link>
+                                <Link
+                                    to="#rates"
+                                    className="border-2 border-white hover:bg-white hover:bg-opacity-20 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
+                                    aria-label="View Rates"
+                                >
+                                    View Rates
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Airport Cards Section */}
+                    <div className="grid md:grid-cols-3 gap-8 mb-16">
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+                            <div className="h-48 bg-blue-50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </div>
+                            <div className="p-6">
+                                <h3 className="text-xl font-bold mb-2">Pearson Airport (YYZ)</h3>
+                                <p className="text-gray-600 mb-4">25-35 minutes from downtown Toronto</p>
+                                <p className="text-primary font-medium">From $85</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+                            <div className="h-48 bg-green-50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </div>
+                            <div className="p-6">
+                                <h3 className="text-xl font-bold mb-2">Billy Bishop (YTZ)</h3>
+                                <p className="text-gray-600 mb-4">10 minutes from downtown Toronto</p>
+                                <p className="text-primary font-medium">From $65</p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
+                            <div className="h-48 bg-purple-50 flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
+                            </div>
+                            <div className="p-6">
+                                <h3 className="text-xl font-bold mb-2">Hamilton (YHM)</h3>
+                                <p className="text-gray-600 mb-4">45-60 minutes from Toronto</p>
+                                <p className="text-primary font-medium">From $150</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Features Section */}
+                    <div className="mb-16">
+                        <h2 className="text-3xl font-bold text-center mb-12">Why Choose Limo4All</h2>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {[
+                                {
+                                    title: "Flight Tracking",
+                                    desc: "Real-time monitoring for perfect timing",
+                                    icon: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                                },
+                                {
+                                    title: "Meet & Greet",
+                                    desc: "Personalized arrivals experience",
+                                    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                                },
+                                {
+                                    title: "24/7 Service",
+                                    desc: "Available for all flight times",
+                                    icon: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                },
+                                {
+                                    title: "Luxury Fleet",
+                                    desc: "Sedans, SUVs, and limousines",
+                                    icon: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                                },
+                                {
+                                    title: "Complimentary Amenities",
+                                    desc: "WiFi, water, phone chargers",
+                                    icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                                },
+                                {
+                                    title: "Corporate Accounts",
+                                    desc: "Detailed billing available",
+                                    icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                                }
+                            ].map((feature, index) => (
+                                <div key={index} className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                                    <div className="w-12 h-12 bg-primary-50 rounded-full flex items-center justify-center mb-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={feature.icon} />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                                    <p className="text-gray-600">{feature.desc}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Rates Section */}
+                    <div id="rates" className="mb-16">
+                        <h2 className="text-3xl font-bold text-center mb-12">Transparent Pricing</h2>
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                            <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200">
+                                <div className="p-8 text-center">
+                                    <h3 className="text-xl font-bold mb-2">Pearson (YYZ)</h3>
+                                    <p className="text-4xl font-bold text-primary mb-4">$85+</p>
+                                    <ul className="space-y-2 text-gray-600">
+                                        <li>Downtown Toronto</li>
+                                        <li>Mississauga</li>
+                                        <li>Brampton</li>
+                                    </ul>
+                                </div>
+                                <div className="p-8 text-center">
+                                    <h3 className="text-xl font-bold mb-2">Billy Bishop (YTZ)</h3>
+                                    <p className="text-4xl font-bold text-primary mb-4">$65+</p>
+                                    <ul className="space-y-2 text-gray-600">
+                                        <li>Downtown Toronto</li>
+                                        <li>Midtown</li>
+                                        <li>Etobicoke</li>
+                                    </ul>
+                                </div>
+                                <div className="p-8 text-center">
+                                    <h3 className="text-xl font-bold mb-2">Hamilton (YHM)</h3>
+                                    <p className="text-4xl font-bold text-primary mb-4">$150+</p>
+                                    <ul className="space-y-2 text-gray-600">
+                                        <li>Downtown Toronto</li>
+                                        <li>Oakville</li>
+                                        <li>Burlington</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className="bg-gray-50 p-6 text-center border-t border-gray-200">
+                                <p className="text-gray-600">All prices include GST and gratuity. Contact us for corporate rates.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* CTA Section */}
+                    <div className="text-center">
+                        <h2 className="text-3xl font-bold mb-6">Ready for Your Luxury Transfer?</h2>
+                        <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-8">
+                            Experience the Limo4All difference with our premium airport transportation service.
+                        </p>
+                        <Link
+                            to="/contact"
+                            className="inline-block bg-primary hover:bg-primary-700 text-white font-bold py-4 px-12 rounded-full transition-colors duration-300 text-lg shadow-lg"
+                            aria-label="Book Your Airport Transfer Now"
+                        >
+                            Book Now
+                        </Link>
+                        <p className="mt-4 text-gray-600">Serving Toronto, Hamilton, and surrounding areas</p>
+                    </div>
+                </div>
+            </section>
+        </>
     );
 };
 
