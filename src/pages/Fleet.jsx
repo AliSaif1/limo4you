@@ -278,12 +278,23 @@ const Fleet = () => {
 
   const handleNextStep = () => {
     const errors = {};
-    if (!formData.email || !formData.phone) errors.contact = 'Either email or phone number is required';
-    if (!formData.date) errors.date = 'Date is required';
-    if (!formData.slot) errors.slot = 'Time slot is required';
+
+    if (!formData.email || !formData.phone) {
+      errors.contact = 'Both email and phone number are required';
+    }
+
+    if (!formData.date) {
+      errors.date = 'Date is required';
+    }
+
+    if (!formData.slot) {
+      errors.slot = 'Time slot is required';
+    }
 
     setFormErrors(errors);
-    if (Object.keys(errors).length === 0) setCurrentStep(2);
+    if (Object.keys(errors).length === 0) {
+      setCurrentStep(2);
+    }
   };
 
   const handlePrevStep = () => setCurrentStep(1);
