@@ -7,14 +7,30 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
 // Constants
-const TIME_SLOTS = (() => {
+const getTimeSlots = (selectedDate) => {
+  if (!selectedDate) return [];
+
   const slots = [];
+  const now = new Date();
+  const selected = new Date(selectedDate);
+
   for (let hour = 8; hour <= 20; hour += 3) {
     const endHour = hour + 3;
-    slots.push(`${hour}:00 - ${endHour}:00`);
+
+    // Skip slots if selected date is today and the slot has already passed
+    if (
+      selected.toDateString() === now.toDateString() &&
+      now.getHours() >= endHour
+    ) {
+      continue;
+    }
+
+    const slot = `${hour}:00 - ${endHour}:00`;
+    slots.push(slot);
   }
+
   return slots;
-})();
+};
 
 const LIMOUSINES = [
   {
@@ -166,6 +182,7 @@ const Fleet = () => {
   const [formErrors, setFormErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const [availableSlots, setAvailableSlots] = useState([]);
 
   const handleViewFleet = () => navigate('/fleet');
 
@@ -189,7 +206,46 @@ const Fleet = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to midnight for date-only comparison
+
+      if (selectedDate < today) {
+        // Date is before today — disallow it
+        setAvailableSlots([]);
+        setFormData((prev) => ({
+          ...prev,
+          date: value,
+          slot: '',
+          time: '',
+        }));
+        return;
+      }
+
+      // Date is today or future — allow slots
+      setAvailableSlots(getTimeSlots(value));
+      setFormData((prev) => ({
+        ...prev,
+        date: value,
+        slot: '',
+        time: '',
+      }));
+      return;
+    }
+
+    if (name === 'slot') {
+      setFormData((prev) => ({
+        ...prev,
+        slot: value,
+        time: value,
+        duration: 3,
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNextStep = () => {
@@ -345,12 +401,18 @@ const Fleet = () => {
             name="slot"
             value={formData.slot}
             onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tZG93biI+PHBhdGggZD0ibTYgOSA2IDYgNi02Ii8+PC9zdmc+')] bg-no-repeat bg-[center_right_1rem]"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[...]"
+            disabled={!formData.date}
           >
-            <option value="">Select time</option>
-            {TIME_SLOTS.map((slot, index) => (
-              <option key={index} value={slot}>{slot}</option>
-            ))}
+            <option value="">{!formData.date ? 'Select date first' : 'Select time'}</option>
+
+            {availableSlots.length > 0 ? (
+              availableSlots.map((slot, index) => (
+                <option key={index} value={slot}>{slot}</option>
+              ))
+            ) : (
+              formData.date && <option disabled>No slots available</option>
+            )}
           </select>
           {formErrors.slot && <p className="text-red-500 text-sm -mt-3">{formErrors.slot}</p>}
         </div>

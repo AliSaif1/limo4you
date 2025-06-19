@@ -3,20 +3,38 @@ import Modal from 'react-modal';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../firebase'; // Adjust path as needed
 
-const TIME_SLOTS = (() => {
+// Constants
+const getTimeSlots = (selectedDate) => {
+    if (!selectedDate) return [];
+
     const slots = [];
+    const now = new Date();
+    const selected = new Date(selectedDate);
+
     for (let hour = 8; hour <= 20; hour += 3) {
         const endHour = hour + 3;
-        slots.push(`${hour}:00 - ${endHour}:00`);
+
+        // Skip slots if selected date is today and the slot has already passed
+        if (
+            selected.toDateString() === now.toDateString() &&
+            now.getHours() >= endHour
+        ) {
+            continue;
+        }
+
+        const slot = `${hour}:00 - ${endHour}:00`;
+        slots.push(slot);
     }
+
     return slots;
-})();
+};
 
 const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [apiError, setApiError] = useState(null);
+    const [availableSlots, setAvailableSlots] = useState([]);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -33,7 +51,46 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+
+        if (name === 'date') {
+            const selectedDate = new Date(value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Normalize to midnight for date-only comparison
+
+            if (selectedDate < today) {
+                // Date is before today — disallow it
+                setAvailableSlots([]);
+                setFormData((prev) => ({
+                    ...prev,
+                    date: value,
+                    slot: '',
+                    time: '',
+                }));
+                return;
+            }
+
+            // Date is today or future — allow slots
+            setAvailableSlots(getTimeSlots(value));
+            setFormData((prev) => ({
+                ...prev,
+                date: value,
+                slot: '',
+                time: '',
+            }));
+            return;
+        }
+
+        if (name === 'slot') {
+            setFormData((prev) => ({
+                ...prev,
+                slot: value,
+                time: value,
+                duration: 3,
+            }));
+            return;
+        }
+
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const validateForm = () => {
@@ -47,7 +104,6 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
     };
-
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -164,7 +220,7 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
                                         formErrors={formErrors}
                                         handleInputChange={handleInputChange}
                                         handleNextStep={handleNextStep}
-                                        TIME_SLOTS={TIME_SLOTS}
+                                        TIME_SLOTS={availableSlots}
                                     />
                                 ) : (
                                     <StepTwo

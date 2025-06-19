@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { collection, query, where, getDocs, addDoc } from 'firebase/firestore';
+import { useState } from 'react';
+import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Calendar, Clock, MapPin, User, ChevronLeft, Car, Smartphone, Mail, X } from 'lucide-react';
 
@@ -11,42 +11,7 @@ const VEHICLE_TYPES = [
   { id: 'party-limo', name: 'Party Limousine', capacity: 14, icon: '🎉', price: 400 }
 ];
 
-const OPERATING_HOURS = { start: 8, end: 24 }; // 8:00 AM to 12:00 AM
 const MINIMUM_DURATION = 3; // 3 hours minimum
-
-// Helper functions
-const generateTimeSlots = () => {
-  const slots = [];
-  for (let hour = OPERATING_HOURS.start; hour < OPERATING_HOURS.end; hour += 3) {
-    const endHour = hour + 3;
-    // Only add the slot if it ends before or at midnight (24:00)
-    if (endHour <= 24) {
-      slots.push({
-        start: `${hour.toString().padStart(2, '0')}:00`,
-        end: `${endHour.toString().padStart(2, '0')}:00`,
-        display: `${hour.toString().padStart(2, '0')}:00 - ${endHour.toString().padStart(2, '0')}:00`
-      });
-    }
-  }
-  return slots;
-};
-
-const isTimeSlotAvailable = (timeToCheck, duration, bookedSlots) => {
-  const [hours, minutes] = timeToCheck.split(':').map(Number);
-  const checkTime = hours * 60 + minutes;
-  const checkEndTime = checkTime + (duration * 60);
-
-  return !bookedSlots.some(slot => {
-    const [slotHours, slotMinutes] = slot.time.split(':').map(Number);
-    const slotTime = slotHours * 60 + slotMinutes;
-    const slotEndTime = slotTime + ((slot.duration || MINIMUM_DURATION) * 60);
-
-    return (
-      (checkTime < slotEndTime) &&
-      (checkEndTime > slotTime)
-    );
-  });
-};
 
 // Confirmation Modal Component
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
@@ -142,12 +107,77 @@ const VehicleSelection = ({ formData, setFormData, errors, onNext }) => {
   );
 };
 
-const DateTimeSelection = ({ formData, setFormData, bookedSlots, errors, onNext, onBack }) => {
-  const availableSlots = formData.date
-    ? generateTimeSlots().filter(slot =>
-      isTimeSlotAvailable(slot.start, MINIMUM_DURATION, bookedSlots)
-    )
-    : [];
+const getTimeSlots = (selectedDate) => {
+  if (!selectedDate) return [];
+
+  const slots = [];
+  const now = new Date();
+  const selected = new Date(selectedDate);
+
+  for (let hour = 8; hour <= 20; hour += 3) {
+    const endHour = hour + 3;
+
+    // Skip slots if selected date is today and the slot has already passed
+    if (
+      selected.toDateString() === now.toDateString() &&
+      now.getHours() >= endHour
+    ) {
+      continue;
+    }
+
+    const slot = `${hour}:00 - ${endHour}:00`;
+    slots.push(slot);
+  }
+
+  return slots;
+};
+
+const DateTimeSelection = ({ formData, setFormData, errors, onNext, onBack }) => {
+  const [availableSlots, setAvailableSlots] = useState([]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+
+    if (name === 'date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to midnight for date-only comparison
+
+      if (selectedDate < today) {
+        // Date is before today — disallow it
+        setAvailableSlots([]);
+        setFormData((prev) => ({
+          ...prev,
+          date: value,
+          slot: '',
+          time: '',
+        }));
+        return;
+      }
+
+      // Date is today or future — allow slots
+      setAvailableSlots(getTimeSlots(value));
+      setFormData((prev) => ({
+        ...prev,
+        date: value,
+        slot: '',
+        time: '',
+      }));
+      return;
+    }
+
+    if (name === 'slot') {
+      setFormData((prev) => ({
+        ...prev,
+        slot: value,
+        time: value,
+        duration: 3,
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="mb-8">
@@ -175,7 +205,7 @@ const DateTimeSelection = ({ formData, setFormData, bookedSlots, errors, onNext,
               className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800 ${errors.date ? 'border-red-500' : 'border-gray-300'
                 }`}
               value={formData.date}
-              onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+              onChange={handleInputChange}
               min={new Date().toISOString().split('T')[0]}
               required
             />
@@ -188,21 +218,21 @@ const DateTimeSelection = ({ formData, setFormData, bookedSlots, errors, onNext,
           <div className="relative">
             <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <select
-              name="time"
-              className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800 ${errors.time ? 'border-red-500' : 'border-gray-300'
-                }`}
+              name="slot"
               value={formData.time}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                time: e.target.value,
-                duration: MINIMUM_DURATION
-              }))}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[...]"
               disabled={!formData.date}
             >
-              <option value="">Select a time</option>
-              {availableSlots.map(slot => (
-                <option key={slot.start} value={slot.start}>{slot.display}</option>
-              ))}
+              <option value="">{!formData.date ? 'Select date first' : 'Select time'}</option>
+
+              {availableSlots.length > 0 ? (
+                availableSlots.map((slot, index) => (
+                  <option key={index} value={slot}>{slot}</option>
+                ))
+              ) : (
+                formData.date && <option disabled>No slots available</option>
+              )}
             </select>
           </div>
           {errors.time && <p className="text-red-500 text-xs mt-1">{errors.time}</p>}
@@ -663,32 +693,12 @@ const BookingForm = () => {
     email: '',
     phone: ''
   });
-  const [bookedSlots, setBookedSlots] = useState([]);
+  const [bookedSlots,] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [apiError, setApiError] = useState(null);
-
-  // Fetch booked slots when date changes
-  useEffect(() => {
-    if (formData.date) {
-      const fetchBookedSlots = async () => {
-        try {
-          const bookingsRef = collection(db, 'bookings');
-          const q = query(bookingsRef, where('date', '==', formData.date));
-          const snapshot = await getDocs(q);
-
-          // setBookedSlots(snapshot.empty ? [] : snapshot.docs.map(doc => doc.data()));
-        } catch (error) {
-          console.error("Error fetching booked slots:", error);
-          setBookedSlots([]);
-        }
-      };
-
-      fetchBookedSlots();
-    }
-  }, [formData.date]);
 
   const handleSubmit = async () => {
     setShowConfirmation(false);

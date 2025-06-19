@@ -6,14 +6,30 @@ import Modal from 'react-modal';
 Modal.setAppElement('#root');
 
 // Constants
-const TIME_SLOTS = (() => {
+const getTimeSlots = (selectedDate) => {
+  if (!selectedDate) return [];
+
   const slots = [];
+  const now = new Date();
+  const selected = new Date(selectedDate);
+
   for (let hour = 8; hour <= 20; hour += 3) {
     const endHour = hour + 3;
-    slots.push(`${hour}:00 - ${endHour}:00`);
+
+    // Skip slots if selected date is today and the slot has already passed
+    if (
+      selected.toDateString() === now.toDateString() &&
+      now.getHours() >= endHour
+    ) {
+      continue;
+    }
+
+    const slot = `${hour}:00 - ${endHour}:00`;
+    slots.push(slot);
   }
+
   return slots;
-})();
+};
 
 const LIMOUSINES = [
   {
@@ -251,7 +267,7 @@ const Fleet = () => {
   });
   const [formErrors, setFormErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState(null);
+  const [availableSlots, setAvailableSlots] = useState([]);
 
   const handleReserveClick = (limo) => {
     setSelectedLimo(limo);
@@ -273,28 +289,56 @@ const Fleet = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'date') {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize to midnight for date-only comparison
+
+      if (selectedDate < today) {
+        // Date is before today — disallow it
+        setAvailableSlots([]);
+        setFormData((prev) => ({
+          ...prev,
+          date: value,
+          slot: '',
+          time: '',
+        }));
+        return;
+      }
+
+      // Date is today or future — allow slots
+      setAvailableSlots(getTimeSlots(value));
+      setFormData((prev) => ({
+        ...prev,
+        date: value,
+        slot: '',
+        time: '',
+      }));
+      return;
+    }
+
+    if (name === 'slot') {
+      setFormData((prev) => ({
+        ...prev,
+        slot: value,
+        time: value,
+        duration: 3,
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNextStep = () => {
     const errors = {};
-
-    if (!formData.email || !formData.phone) {
-      errors.contact = 'Both email and phone number are required';
-    }
-
-    if (!formData.date) {
-      errors.date = 'Date is required';
-    }
-
-    if (!formData.slot) {
-      errors.slot = 'Time slot is required';
-    }
+    if (!formData.email && !formData.phone) errors.contact = 'Either email or phone number is required';
+    if (!formData.date) errors.date = 'Date is required';
+    if (!formData.slot) errors.slot = 'Time slot is required';
 
     setFormErrors(errors);
-    if (Object.keys(errors).length === 0) {
-      setCurrentStep(2);
-    }
+    if (Object.keys(errors).length === 0) setCurrentStep(2);
   };
 
   const handlePrevStep = () => setCurrentStep(1);
@@ -315,48 +359,17 @@ const Fleet = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
-    setApiError(null);
-
     try {
-      // Save to Firestore
       await addDoc(collection(db, 'reservations'), {
         vehicleType: selectedLimo.name,
         ...formData,
         createdAt: new Date(),
         status: 'pending'
       });
-
-      // Send email notification
-      const response = await fetch('/api/send-quote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          pickup: formData.pickup,
-          destination: formData.destination,
-          date: formData.date,
-          slot: formData.slot,
-          passengers: formData.passengers,
-          vehicleType: selectedLimo.name,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to send confirmation email');
-      }
-
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Reservation error:', error);
-      setApiError({
-        title: "Reservation Failed",
-        message: error.message || "There was an error processing your reservation.",
-        details: "Please try again or contact support if the problem persists."
-      });
+      console.error('Error adding reservation: ', error);
+      setFormErrors({ submit: 'There was an error submitting your reservation. Please try again.' });
     } finally {
       setIsLoading(false);
     }
@@ -429,12 +442,18 @@ const Fleet = () => {
             name="slot"
             value={formData.slot}
             onChange={handleInputChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNoZXZyb24tZG93biI+PHBhdGggZD0ibTYgOSA2IDYgNi02Ii8+PC9zdmc+')] bg-no-repeat bg-[center_right_1rem]"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[...]"
+            disabled={!formData.date}
           >
-            <option value="">Select time</option>
-            {TIME_SLOTS.map((slot, index) => (
-              <option key={index} value={slot}>{slot}</option>
-            ))}
+            <option value="">{!formData.date ? 'Select date first' : 'Select time'}</option>
+
+            {availableSlots.length > 0 ? (
+              availableSlots.map((slot, index) => (
+                <option key={index} value={slot}>{slot}</option>
+              ))
+            ) : (
+              formData.date && <option disabled>No slots available</option>
+            )}
           </select>
           {formErrors.slot && <p className="text-red-500 text-sm -mt-3">{formErrors.slot}</p>}
         </div>
@@ -785,43 +804,6 @@ const Fleet = () => {
           )}
         </div>
       </Modal>
-
-      {/* Error Modal */}
-      {apiError && (
-        <Modal
-          isOpen={!!apiError}
-          onRequestClose={() => setApiError(null)}
-          className="modal"
-          overlayClassName="modal-overlay"
-          contentLabel="Error Message"
-        >
-          <div className="bg-white rounded-xl p-6 max-w-md mx-auto">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 text-red-500 mt-1">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-bold text-gray-900">{apiError.title}</h3>
-                <div className="mt-2 text-sm text-gray-600">
-                  <p>{apiError.message}</p>
-                  {apiError.details && <p className="mt-2 text-gray-500">{apiError.details}</p>}
-                </div>
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    onClick={() => setApiError(null)}
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Modal>
-      )}
 
       <style jsx global>{`
         .modal-overlay {
