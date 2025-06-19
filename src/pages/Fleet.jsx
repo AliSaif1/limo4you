@@ -359,17 +359,48 @@ const Fleet = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setApiError(null);
+
     try {
+      // Save to Firestore
       await addDoc(collection(db, 'reservations'), {
         vehicleType: selectedLimo.name,
         ...formData,
         createdAt: new Date(),
         status: 'pending'
       });
+
+      // Send email notification
+      const response = await fetch('/api/send-quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          pickup: formData.pickup,
+          destination: formData.destination,
+          date: formData.date,
+          slot: formData.slot,
+          passengers: formData.passengers,
+          vehicleType: selectedLimo.name,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to send confirmation email');
+      }
+
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Error adding reservation: ', error);
-      setFormErrors({ submit: 'There was an error submitting your reservation. Please try again.' });
+      console.error('Reservation error:', error);
+      setApiError({
+        title: "Reservation Failed",
+        message: error.message || "There was an error processing your reservation.",
+        details: "Please try again or contact support if the problem persists."
+      });
     } finally {
       setIsLoading(false);
     }
