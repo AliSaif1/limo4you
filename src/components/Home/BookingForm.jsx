@@ -108,8 +108,8 @@ const VehicleSelection = ({ formData, setFormData, errors, onNext }) => {
               }));
             }}
             className={`p-3 rounded-lg border transition-all flex flex-col items-center gap-2 ${formData.vehicleType === vehicle.id
-                ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
-                : 'border-gray-200 hover:border-primary/50'
+              ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
+              : 'border-gray-200 hover:border-primary/50'
               }`}
           >
             <span className="text-2xl">{vehicle.icon}</span>
@@ -678,7 +678,7 @@ const BookingForm = () => {
           const q = query(bookingsRef, where('date', '==', formData.date));
           const snapshot = await getDocs(q);
 
-          setBookedSlots(snapshot.empty ? [] : snapshot.docs.map(doc => doc.data()));
+          // setBookedSlots(snapshot.empty ? [] : snapshot.docs.map(doc => doc.data()));
         } catch (error) {
           console.error("Error fetching booked slots:", error);
           setBookedSlots([]);
@@ -700,10 +700,26 @@ const BookingForm = () => {
         duration: MINIMUM_DURATION,
         passengers: parseInt(formData.passengers),
         createdAt: new Date(),
-        status: 'pending',
+        status: 'booked',
         endTime: calculateEndTime(formData.time)
       });
+      
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          pickup: formData.pickup,
+          destination: formData.destination,
+          date: formData.date,
+          time: formData.time,
+          passengers: formData.passengers
+        }),
+      });
 
+      // ✅ Reset form
       setShowSuccess(true);
       setFormData({
         vehicleType: '',
