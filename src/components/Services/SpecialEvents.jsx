@@ -53,17 +53,17 @@ const SpecialEvents = () => {
                 </div>
             </div>
 
-            {/* Sticky Booking Button - Remains exactly the same */}
-            <div className="fixed bottom-6 left-6 z-50">
+            {/* Sticky Booking Button - Hidden on mobile, visible on lg screens */}
+            <div className="fixed bottom-6 left-6 z-50 hidden lg:block">
                 <Link
-                    to="/contact"
+                    to="/contact#contact-form"
                     className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
                     aria-label="Book Corporate Transportation"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Book Now
+                    Contact Now
                 </Link>
             </div>
 
@@ -86,13 +86,13 @@ const SpecialEvents = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
                             <Link
-                                to="/contact"
+                                to="/contact#contact-form"
                                 className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg"
                             >
-                                Request Event Quote
+                                Book Your Ride
                             </Link>
                             <Link
-                                to="#packages"
+                                to="/fleet"
                                 className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                             >
                                 View Our Fleet
@@ -169,10 +169,10 @@ const SpecialEvents = () => {
 
                         <div className="text-center">
                             <Link
-                                to="/contact"
+                                to="/contact#contact-form"
                                 className="inline-block bg-primary hover:bg-primary-700 text-white font-medium py-3 px-8 rounded-full transition-colors duration-300"
                             >
-                                Reserve Event Transportation
+                                Book Now
                             </Link>
                         </div>
                     </div>

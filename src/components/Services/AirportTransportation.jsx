@@ -2,6 +2,13 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
 const AirportTransportation = () => {
+    const scrollToRates = () => {
+        const element = document.getElementById('rates');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <>
             <Helmet>
@@ -70,89 +77,123 @@ const AirportTransportation = () => {
                 </div>
             </div>
 
-            {/* Sticky Booking Button */}
-            <div className="fixed bottom-6 left-6 z-50">
+            {/* Sticky Booking Button - Hidden on mobile, visible on lg screens */}
+            <div className="fixed bottom-6 left-6 z-50 hidden lg:block">
                 <Link
-                    to="/contact"
+                    to="/contact#contact-form"
                     className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
                     aria-label="Book Corporate Transportation"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Book Now
+                    Contact Now
                 </Link>
             </div>
 
             {/* Page Content */}
             <section className="py-16 bg-white mt-2">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    {/* Hero Section with Booking Button */}
-                    <div className="relative bg-gradient-to-r from-primary to-secondary rounded-xl p-8 mb-16 text-white">
-                        <div className="max-w-2xl mx-auto text-center">
-                            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                                Premium Airport Transfers in <span className="text-white">Toronto & Hamilton</span>
-                            </h1>
-                            <p className="text-lg mb-8">
-                                Stress-free luxury transportation to all major airports with real-time flight tracking
-                            </p>
-                            <div className="flex flex-col sm:flex-row justify-center gap-4">
-                                <Link
-                                    to="/contact"
-                                    className="bg-white hover:bg-gray-100 text-primary font-bold py-3 px-8 rounded-full transition-colors duration-300"
-                                    aria-label="Book Airport Transfer Now"
-                                >
-                                    Book Now
-                                </Link>
-                                <Link
-                                    to="#rates"
-                                    className="border-2 border-white hover:bg-white hover:bg-opacity-20 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
-                                    aria-label="View Rates"
-                                >
-                                    View Rates
-                                </Link>
+                    {/* Modern Hero Section */}
+                    <div className="relative overflow-hidden bg-gray-900">
+                        {/* Animated background elements */}
+                        <div className="absolute inset-0 z-0 opacity-20">
+                            <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
+                            <div className="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
+                            <div className="absolute bottom-0 left-1/2 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+                        </div>
+
+                        {/* Hero content */}
+                        <div className="relative z-10 max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8">
+                            <div className="text-center">
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-6">
+                                    <span className="block">Premium Airport</span>
+                                    <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary-light to-secondary-light">
+                                        Transfers in Toronto
+                                    </span>
+                                </h1>
+                                <p className="max-w-2xl mx-auto text-xl text-gray-300 mb-10">
+                                    Stress-free luxury transportation with real-time flight tracking and professional chauffeurs
+                                </p>
+                                <div className="flex flex-col sm:flex-row justify-center gap-4">
+                                    <Link
+                                        to="/contact#contact-form"
+                                        className="flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-secondary hover:bg-secondary-light shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                                        aria-label="Book Airport Transfer Now"
+                                    >
+                                        Book Your Ride
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                    </Link>
+                                    <button
+                                        onClick={scrollToRates}
+                                        className="flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-transparent hover:bg-white hover:bg-opacity-10 border-white border-opacity-50 transition-all duration-300 transform hover:-translate-y-1"
+                                        aria-label="View Rates"
+                                    >
+                                        View Pricing
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Airport Cards Section */}
-                    <div className="grid md:grid-cols-3 gap-8 mb-16">
-                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
-                            <div className="h-48 bg-blue-50 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
+                    <div className="grid md:grid-cols-3 gap-8 mb-16 mt-6">
+                        {/* Pearson Airport Card */}
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                            <div className="h-48 bg-blue-50 relative overflow-hidden">
+                                <img
+                                    src='/pearson.png'
+                                    alt='Pearson Airport'
+                                    className="w-full h-full object-cover object-center"
+                                    style={{ objectPosition: 'center 30%' }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                                <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white drop-shadow-md">Pearson Airport (YYZ)</h3>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold mb-2">Pearson Airport (YYZ)</h3>
                                 <p className="text-gray-600 mb-4">25-35 minutes from downtown Toronto</p>
-                                <p className="text-primary font-medium">From $85</p>
+                                <p className="text-primary font-medium text-lg">From $85</p>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
-                            <div className="h-48 bg-green-50 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
+                        {/* Billy Bishop Airport Card */}
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                            <div className="h-48 bg-green-50 relative overflow-hidden">
+                                <img
+                                    src='/BillyBishop.png'
+                                    alt='Billy Bishop Airport'
+                                    className="w-full h-full object-cover object-center"
+                                    style={{ objectPosition: 'center 30%' }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                                <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white drop-shadow-md">Billy Bishop (YTZ)</h3>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold mb-2">Billy Bishop (YTZ)</h3>
                                 <p className="text-gray-600 mb-4">10 minutes from downtown Toronto</p>
-                                <p className="text-primary font-medium">From $65</p>
+                                <p className="text-primary font-medium text-lg">From $65</p>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow">
-                            <div className="h-48 bg-purple-50 flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                </svg>
+                        {/* Hamilton Airport Card */}
+                        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                            <div className="h-48 bg-purple-50 relative overflow-hidden">
+                                <img
+                                    src='/Hamilton.png'
+                                    alt='Hamilton Airport (YHM)'
+                                    className="w-full h-full object-cover object-center"
+                                    style={{ objectPosition: 'center 30%' }}
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                                <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white drop-shadow-md">Hamilton (YHM)</h3>
                             </div>
                             <div className="p-6">
-                                <h3 className="text-xl font-bold mb-2">Hamilton (YHM)</h3>
                                 <p className="text-gray-600 mb-4">45-60 minutes from Toronto</p>
-                                <p className="text-primary font-medium">From $150</p>
+                                <p className="text-primary font-medium text-lg">From $150</p>
                             </div>
                         </div>
                     </div>
@@ -252,7 +293,7 @@ const AirportTransportation = () => {
                             Experience the Limo4All difference with our premium airport transportation service.
                         </p>
                         <Link
-                            to="/contact"
+                            to="/contact#contact-form"
                             className="inline-block bg-primary hover:bg-primary-700 text-white font-bold py-4 px-12 rounded-full transition-colors duration-300 text-lg shadow-lg"
                             aria-label="Book Your Airport Transfer Now"
                         >

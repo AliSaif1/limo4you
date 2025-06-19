@@ -52,17 +52,17 @@ const Weddings = () => {
                 </div>
             </div>
 
-            {/* Sticky Booking Button */}
-            <div className="fixed bottom-6 left-6 z-50">
+            {/* Sticky Booking Button - Hidden on mobile, visible on lg screens */}
+            <div className="fixed bottom-6 left-6 z-50 hidden lg:block">
                 <Link
-                    to="/contact"
+                    to="/contact#contact-form"
                     className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
                     aria-label="Book Corporate Transportation"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Book Now
+                    Contact Now
                 </Link>
             </div>
 
@@ -85,13 +85,13 @@ const Weddings = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
                             <Link
-                                to="/contact"
+                                to="/contact#contact-form"
                                 className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg"
                             >
-                                Request Wedding Package
+                                Book Your Ride
                             </Link>
                             <Link
-                                to="#packages"
+                                to="/fleet"
                                 className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                             >
                                 View Our Fleet
@@ -159,73 +159,6 @@ const Weddings = () => {
                         </div>
                     </div>
 
-                    {/* Packages Section */}
-                    <div id="packages" className="mb-20">
-                        <div className="text-center mb-12">
-                            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                                Wedding Transportation Packages
-                            </h2>
-                            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                                Tailored solutions for every part of your wedding day
-                            </p>
-                        </div>
-
-                        <div className="grid md:grid-cols-3 gap-8">
-                            {[
-                                {
-                                    name: "Bridal Limousine",
-                                    description: "Classic stretch limousine for the bride and groom",
-                                    features: ["Decorated interior", "Red carpet service", "Champagne toast", "8-hour package"],
-                                    price: "$650"
-                                },
-                                {
-                                    name: "Wedding Party SUVs",
-                                    description: "Luxury SUVs for bridesmaids and groomsmen",
-                                    features: ["3-vehicle minimum", "Coordinated arrivals", "Bottle water service", "6-hour package"],
-                                    price: "$350/vehicle"
-                                },
-                                {
-                                    name: "Guest Shuttle Service",
-                                    description: "Transportation for wedding guests",
-                                    features: ["20-passenger capacity", "Hotel to venue service", "Late night return", "Custom scheduling"],
-                                    price: "$95/hour"
-                                }
-                            ].map((packageItem, index) => (
-                                <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-2">
-                                    <div className={`h-48 ${index === 0 ? 'bg-pink-50' : index === 1 ? 'bg-blue-50' : 'bg-purple-50'} flex items-center justify-center relative overflow-hidden`}>
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                                        </svg>
-                                        <span className="absolute bottom-4 left-4 bg-white text-primary px-3 py-1 rounded-full text-xs font-bold shadow-sm">
-                                            {packageItem.price}
-                                        </span>
-                                    </div>
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-bold mb-2">{packageItem.name}</h3>
-                                        <p className="text-gray-600 mb-4">{packageItem.description}</p>
-                                        <ul className="space-y-2 mb-4">
-                                            {packageItem.features.map((feature, i) => (
-                                                <li key={i} className="flex items-start">
-                                                    <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                    <span>{feature}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                        <Link
-                                            to="/contact"
-                                            className="inline-block w-full text-center bg-primary hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-full transition-colors duration-300"
-                                        >
-                                            Book This Package
-                                        </Link>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
                     {/* Testimonials */}
                     <div className="mb-20">
                         <div className="text-center mb-12">
@@ -275,10 +208,10 @@ const Weddings = () => {
                             </p>
                             <div className="flex flex-col sm:flex-row justify-center gap-4">
                                 <Link
-                                    to="/contact"
+                                    to="/contact#contact-form"
                                     className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                                 >
-                                    Get Package
+                                    Book Now
                                 </Link>
                                 <Link
                                     to="tel:+16471234567"

@@ -60,17 +60,17 @@ const SportingEvents = () => {
                 </div>
             </div>
 
-            {/* Sticky Booking Button - Unchanged */}
-            <div className="fixed bottom-6 left-6 z-50">
+            {/* Sticky Booking Button - Hidden on mobile, visible on lg screens */}
+            <div className="fixed bottom-6 left-6 z-50 hidden lg:block">
                 <Link
-                    to="/contact"
+                    to="/contact#contact-form"
                     className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
                     aria-label="Book Corporate Transportation"
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Book Now
+                    Contact Now
                 </Link>
             </div>
 
@@ -101,16 +101,16 @@ const SportingEvents = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
                             <Link
-                                to="/contact"
+                                to="/contact#contact-form"
                                 className="bg-secondary hover:bg-secondary-light text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                             >
                                 Book Your Ride
                             </Link>
                             <Link
-                                to="#packages"
+                                to="/fleet"
                                 className="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-4 px-8 rounded-full transition-all duration-300"
                             >
-                                View Packages
+                                Explore Our Fleet
                             </Link>
                         </div>
                     </div>
@@ -209,101 +209,6 @@ const SportingEvents = () => {
                 </div>
             </section>
 
-            {/* Vehicle Showcase Section */}
-            <section className="py-20 bg-white">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                            Our Sports Transportation Fleet
-                        </h2>
-                        <div className="w-16 h-1 bg-primary mx-auto mb-6"></div>
-                        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                            Vehicles designed for sports fans and groups of all sizes
-                        </p>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-8 mb-16">
-                        <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
-                            <div className="h-64 bg-[url('https://images.unsplash.com/photo-1551641506-ee5bf4cb45f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2084&q=80')] bg-cover bg-center"></div>
-                            <div className="p-8">
-                                <h3 className="text-2xl font-bold mb-4">Luxury SUVs & Limousines</h3>
-                                <div className="flex items-center mb-4">
-                                    <svg className="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    <span className="text-gray-600">Capacity: 6-12 people</span>
-                                </div>
-                                <ul className="space-y-2 mb-6">
-                                    <li className="flex items-start">
-                                        <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Direct stadium drop-off</span>
-                                    </li>
-                                    <li className="flex items-start">
-                                        <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Team-colored interior lighting</span>
-                                    </li>
-                                    <li className="flex items-start">
-                                        <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Chilled beverage compartments</span>
-                                    </li>
-                                </ul>
-                                <Link
-                                    to="/contact"
-                                    className="inline-block bg-primary hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300"
-                                >
-                                    Book Luxury SUV
-                                </Link>
-                            </div>
-                        </div>
-
-                        <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl">
-                            <div className="h-64 bg-[url('https://images.unsplash.com/photo-1519671482749-fd09be7ccebf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center"></div>
-                            <div className="p-8">
-                                <h3 className="text-2xl font-bold mb-4">Sports Party Buses</h3>
-                                <div className="flex items-center mb-4">
-                                    <svg className="h-5 w-5 text-primary mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    <span className="text-gray-600">Capacity: 20-30 people</span>
-                                </div>
-                                <ul className="space-y-2 mb-6">
-                                    <li className="flex items-start">
-                                        <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Custom team decorations</span>
-                                    </li>
-                                    <li className="flex items-start">
-                                        <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Premium surround sound for game audio</span>
-                                    </li>
-                                    <li className="flex items-start">
-                                        <svg className="h-5 w-5 text-primary mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                        <span>Built-in coolers and snack bars</span>
-                                    </li>
-                                </ul>
-                                <Link
-                                    to="/contact"
-                                    className="inline-block bg-primary hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-full transition-colors duration-300"
-                                >
-                                    Book Party Bus
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             {/* Testimonials Section */}
             <section className="py-20 bg-secondary text-white">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -375,10 +280,10 @@ const SportingEvents = () => {
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <Link
-                            to="/contact"
+                            to="/contact#contact-form"
                             className="bg-primary hover:bg-primary-600 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
                         >
-                            Get a Custom Quote
+                            Book Now
                         </Link>
                         <a
                             href="tel:+16471234567"

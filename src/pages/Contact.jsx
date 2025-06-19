@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Phone, Mail, Clock, Send, ShieldCheck, Star, Calendar, Headset, MapPin, Car, Plane } from 'lucide-react';
 import { Helmet } from 'react-helmet';
+import { useLocation } from 'react-router-dom';
 
 // SEO Component
 const ContactSEO = () => (
@@ -261,6 +262,17 @@ const ServiceArea = () => (
 
 // Main Contact Component
 function Contact() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === '#contact-form') {
+      const element = document.getElementById('contact-form');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [location]);
+
   return (
     <>
       <ContactSEO />
@@ -332,7 +344,9 @@ function Contact() {
                 </div>
               </div>
             </div>
-            <ContactForm />
+            <div id="contact-form">
+              <ContactForm />
+            </div>
           </div>
         </div>
       </div>

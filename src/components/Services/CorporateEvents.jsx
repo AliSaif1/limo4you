@@ -1,7 +1,47 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import { Link } from 'react-router-dom';
+import CorporateReservationModal from '../CorporateReservationModal';
 
 const CorporateEvents = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedVehicle, setSelectedVehicle] = useState(null);
+
+    const corporateVehicles = [
+        {
+            id: 1,
+            name: "Executive Sedans",
+            description: "Mercedes E-Class, BMW 5 Series, Audi A6",
+            maxPassengers: 3,
+            price: "From $85/hour",
+            features: ["WiFi & charging ports", "Spacious interiors", "Privacy partitions"],
+            src: "/Sedan.png"
+        },
+        {
+            id: 2,
+            name: "Luxury SUVs",
+            description: "Cadillac Escalade, Lincoln Navigator, Mercedes GLS",
+            maxPassengers: 6,
+            price: "From $110/hour",
+            features: ["Ample luggage space", "Premium sound system", "Tinted windows"],
+            src: "/GMC-Yukon.png"
+        },
+        {
+            id: 3,
+            name: "Stretch Limousines",
+            description: "10-passenger luxury limos",
+            maxPassengers: 10,
+            price: "From $150/hour",
+            features: ["LED mood lighting", "Premium bar setup", "Privacy divider"],
+            src: "/Executive-Limo.png"
+        }
+    ];
+
+    const openModal = (vehicle) => {
+        setSelectedVehicle(vehicle);
+        setIsModalOpen(true);
+    };
+
     return (
         <>
             <Helmet>
@@ -36,10 +76,14 @@ const CorporateEvents = () => {
                 </div>
             </div>
 
-            {/* Sticky Booking Button */}
-            <div className="fixed bottom-6 left-6 z-50">
-                <Link
-                    to="/contact"
+            {/* Sticky Booking Button - Hidden on mobile, visible on lg screens */}
+            <div className="fixed bottom-6 left-6 z-50 hidden lg:block">
+                <button
+                    onClick={() => openModal({
+                        name: "Corporate Transportation",
+                        maxPassengers: 6,
+                        description: "Premium corporate travel service"
+                    })}
                     className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
                     aria-label="Book Corporate Transportation"
                 >
@@ -47,7 +91,7 @@ const CorporateEvents = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Book Now
-                </Link>
+                </button>
             </div>
 
             {/* Hero Section */}
@@ -68,14 +112,18 @@ const CorporateEvents = () => {
                             Professional chauffeurs, premium vehicles, and discreet service for your corporate needs in Toronto
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Link
-                                to="/contact"
+                            <button
+                                onClick={() => openModal({
+                                    name: "Corporate Transportation",
+                                    maxPassengers: 6,
+                                    description: "Premium corporate travel service"
+                                })}
                                 className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg"
                             >
-                                Request Corporate Rates
-                            </Link>
+                                Book Your Ride
+                            </button>
                             <Link
-                                to="#vehicles"
+                                to="/fleet"
                                 className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                             >
                                 View Our Fleet
@@ -157,30 +205,41 @@ const CorporateEvents = () => {
                         <div className="grid md:grid-cols-3 gap-8">
                             {[
                                 {
+                                    id: 1,
                                     name: "Executive Sedans",
                                     description: "Mercedes E-Class, BMW 5 Series, Audi A6",
                                     features: ["WiFi & charging ports", "Spacious interiors", "Privacy partitions"],
-                                    price: "From $85/hour"
+                                    price: "From $85/hour",
+                                    src: "/Sedan.png",
+                                    maxPassengers: 3
                                 },
                                 {
+                                    id: 2,
                                     name: "Luxury SUVs",
                                     description: "Cadillac Escalade, Lincoln Navigator, Mercedes GLS",
                                     features: ["Ample luggage space", "Premium sound system", "Tinted windows"],
-                                    price: "From $110/hour"
+                                    price: "From $110/hour",
+                                    src: "/GMC-Yukon.png",
+                                    maxPassengers: 6
                                 },
                                 {
+                                    id: 3,
                                     name: "Stretch Limousines",
                                     description: "10-passenger luxury limos",
                                     features: ["LED mood lighting", "Premium bar setup", "Privacy divider"],
-                                    price: "From $150/hour"
+                                    price: "From $150/hour",
+                                    src: "/Executive-Limo.png",
+                                    maxPassengers: 10
                                 }
-                            ].map((vehicle, index) => (
-                                <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-2">
-                                    <div className={`h-48 ${index === 0 ? 'bg-blue-50' : index === 1 ? 'bg-gray-50' : 'bg-purple-50'} flex items-center justify-center relative overflow-hidden`}>
+                            ].map((vehicle) => (
+                                <div key={vehicle.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all hover:-translate-y-2">
+                                    <div className={`h-48 ${vehicle.id === 1 ? 'bg-blue-50' : vehicle.id === 2 ? 'bg-gray-50' : 'bg-purple-50'} flex items-center justify-center relative overflow-hidden`}>
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-20 w-20 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                                        </svg>
+                                        <img
+                                            src={vehicle.src}
+                                            alt={vehicle.name}
+                                            className="w-full h-full object-cover"
+                                        />
                                         <span className="absolute bottom-4 left-4 bg-white text-primary px-3 py-1 rounded-full text-xs font-bold shadow-sm">
                                             {vehicle.price}
                                         </span>
@@ -198,12 +257,12 @@ const CorporateEvents = () => {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <Link
-                                            to="/contact"
+                                        <button
+                                            onClick={() => openModal(vehicle)}
                                             className="inline-block w-full text-center bg-primary hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-full transition-colors duration-300"
                                         >
                                             Book This Vehicle
-                                        </Link>
+                                        </button>
                                     </div>
                                 </div>
                             ))}
@@ -258,12 +317,16 @@ const CorporateEvents = () => {
                                 Contact us today to discuss your corporate transportation needs and receive a customized quote.
                             </p>
                             <div className="flex flex-col sm:flex-row justify-center gap-4">
-                                <Link
-                                    to="/contact"
+                                <button
+                                    onClick={() => openModal({
+                                        name: "Corporate Transportation",
+                                        maxPassengers: 6,
+                                        description: "Premium corporate travel service"
+                                    })}
                                     className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                                 >
-                                    Get Quote
-                                </Link>
+                                    Book Now
+                                </button>
                                 <Link
                                     to="tel:+16471234567"
                                     className="border-2 border-white hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
@@ -275,6 +338,13 @@ const CorporateEvents = () => {
                     </div>
                 </div>
             </section>
+
+            {/* Reservation Modal */}
+            <CorporateReservationModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                selectedLimo={selectedVehicle}
+            />
         </>
     );
 };
