@@ -278,7 +278,7 @@ const Fleet = () => {
 
   const handleNextStep = () => {
     const errors = {};
-    if (!formData.email && !formData.phone) errors.contact = 'Either email or phone number is required';
+    if (!formData.email || !formData.phone) errors.contact = 'Either email or phone number is required';
     if (!formData.date) errors.date = 'Date is required';
     if (!formData.slot) errors.slot = 'Time slot is required';
 
