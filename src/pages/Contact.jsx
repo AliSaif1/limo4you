@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Mail, Clock, Send, ShieldCheck, Star, Calendar, Headset, MapPin, Car, Plane } from 'lucide-react';
+import { Phone, Mail, Clock, Send, Loader2, ShieldCheck, Star, Calendar, Headset, MapPin, Car, Plane } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router-dom';
 
@@ -116,6 +116,8 @@ const ContactForm = () => {
     phone: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -125,13 +127,49 @@ const ContactForm = () => {
     }));
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      setSubmitStatus({ success: true, message: 'Message sent successfully!' });
+      setFormData({ name: '', email: '', phone: '', message: '' }); // Reset form
+    } catch (error) {
+      setSubmitStatus({ success: false, message: error.message });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
       <h2 className="text-2xl font-bold text-primary mb-8 font-serif relative pb-4 after:absolute after:bottom-0 after:left-0 after:w-16 after:h-1 after:bg-secondary">
         Send Us a Message
       </h2>
 
-      <form className="space-y-6" itemScope itemType="https://schema.org/ContactPage">
+      {submitStatus && (
+        <div className={`mb-6 p-4 rounded-lg ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+          {submitStatus.message}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6" itemScope itemType="https://schema.org/ContactPage">
+        {/* Rest of your form fields remain the same */}
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -203,10 +241,20 @@ const ContactForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+          disabled={isSubmitting}
+          className="w-full bg-primary hover:bg-primary-dark text-white font-medium py-3 px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          Send Message
-          <Send className="w-5 h-5 ml-2" />
+          {isSubmitting ? (
+            <>
+              Sending...
+              <Loader2 className="w-5 h-5 ml-2 animate-spin" />
+            </>
+          ) : (
+            <>
+              Send Message
+              <Send className="w-5 h-5 ml-2" />
+            </>
+          )}
         </button>
       </form>
     </div>

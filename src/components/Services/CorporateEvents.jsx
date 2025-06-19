@@ -7,36 +7,6 @@ const CorporateEvents = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedVehicle, setSelectedVehicle] = useState(null);
 
-    const corporateVehicles = [
-        {
-            id: 1,
-            name: "Executive Sedans",
-            description: "Mercedes E-Class, BMW 5 Series, Audi A6",
-            maxPassengers: 3,
-            price: "From $85/hour",
-            features: ["WiFi & charging ports", "Spacious interiors", "Privacy partitions"],
-            src: "/Sedan.png"
-        },
-        {
-            id: 2,
-            name: "Luxury SUVs",
-            description: "Cadillac Escalade, Lincoln Navigator, Mercedes GLS",
-            maxPassengers: 6,
-            price: "From $110/hour",
-            features: ["Ample luggage space", "Premium sound system", "Tinted windows"],
-            src: "/GMC-Yukon.png"
-        },
-        {
-            id: 3,
-            name: "Stretch Limousines",
-            description: "10-passenger luxury limos",
-            maxPassengers: 10,
-            price: "From $150/hour",
-            features: ["LED mood lighting", "Premium bar setup", "Privacy divider"],
-            src: "/Executive-Limo.png"
-        }
-    ];
-
     const openModal = (vehicle) => {
         setSelectedVehicle(vehicle);
         setIsModalOpen(true);

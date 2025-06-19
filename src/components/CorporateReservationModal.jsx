@@ -16,6 +16,7 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
     const [currentStep, setCurrentStep] = useState(1);
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [apiError, setApiError] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -47,22 +48,54 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
         return Object.keys(errors).length === 0;
     };
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
         setIsLoading(true);
+        setApiError(null);
+
         try {
-            await addDoc(collection(db, 'corporateReservations'), {
+            // Save to Firestore
+            await addDoc(collection(db, 'reservations'), {
                 vehicleType: selectedLimo.name,
                 ...formData,
                 createdAt: new Date(),
                 status: 'pending'
             });
+
+            // Send email notification
+            const response = await fetch('/api/send-quote', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone,
+                    pickup: formData.pickup,
+                    destination: formData.destination,
+                    date: formData.date,
+                    slot: formData.slot,
+                    passengers: formData.passengers,
+                    vehicleType: selectedLimo.name,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to send confirmation email');
+            }
+
             setIsSubmitted(true);
         } catch (error) {
-            console.error('Error adding reservation: ', error);
-            setFormErrors({ submit: 'There was an error submitting your reservation. Please try again.' });
+            console.error('Reservation error:', error);
+            setApiError({
+                title: "Reservation Failed",
+                message: error.message || "There was an error processing your reservation.",
+                details: "Please try again or contact support if the problem persists."
+            });
         } finally {
             setIsLoading(false);
         }
@@ -100,53 +133,91 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
     };
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={resetModal}
-            className="modal"
-            overlayClassName="modal-overlay"
-            contentLabel="Corporate Reservation Form"
-            ariaHideApp={false}
-        >
-            {isLoading && (
-                <div className="loading-overlay">
-                    <div className="loading-spinner"></div>
-                </div>
-            )}
-
-            <div className={`bg-white rounded-xl p-6 max-w-md mx-auto relative ${isLoading ? 'opacity-70' : ''}`}>
-                <CloseButton onClose={resetModal} />
-
-                {isSubmitted ? (
-                    <ConfirmationMessage onClose={resetModal} />
-                ) : (
-                    <>
-                        <StepIndicator currentStep={currentStep} />
-                        <ModalHeader selectedLimo={selectedLimo} />
-                        <form onSubmit={handleSubmit}>
-                            {currentStep === 1 ? (
-                                <StepOne
-                                    formData={formData}
-                                    formErrors={formErrors}
-                                    handleInputChange={handleInputChange}
-                                    handleNextStep={handleNextStep}
-                                    TIME_SLOTS={TIME_SLOTS}
-                                />
-                            ) : (
-                                <StepTwo
-                                    formData={formData}
-                                    formErrors={formErrors}
-                                    handleInputChange={handleInputChange}
-                                    handlePrevStep={handlePrevStep}
-                                    selectedLimo={selectedLimo}
-                                    isLoading={isLoading}
-                                />
-                            )}
-                        </form>
-                    </>
+        <>
+            <Modal
+                isOpen={isOpen}
+                onRequestClose={resetModal}
+                className="modal"
+                overlayClassName="modal-overlay"
+                contentLabel="Corporate Reservation Form"
+                ariaHideApp={false}
+            >
+                {isLoading && (
+                    <div className="loading-overlay">
+                        <div className="loading-spinner"></div>
+                    </div>
                 )}
-            </div>
-        </Modal>
+
+                <div className={`bg-white rounded-xl p-6 max-w-md mx-auto relative ${isLoading ? 'opacity-70' : ''}`}>
+                    <CloseButton onClose={resetModal} />
+
+                    {isSubmitted ? (
+                        <ConfirmationMessage onClose={resetModal} />
+                    ) : (
+                        <>
+                            <StepIndicator currentStep={currentStep} />
+                            <ModalHeader selectedLimo={selectedLimo} />
+                            <form onSubmit={handleSubmit}>
+                                {currentStep === 1 ? (
+                                    <StepOne
+                                        formData={formData}
+                                        formErrors={formErrors}
+                                        handleInputChange={handleInputChange}
+                                        handleNextStep={handleNextStep}
+                                        TIME_SLOTS={TIME_SLOTS}
+                                    />
+                                ) : (
+                                    <StepTwo
+                                        formData={formData}
+                                        formErrors={formErrors}
+                                        handleInputChange={handleInputChange}
+                                        handlePrevStep={handlePrevStep}
+                                        selectedLimo={selectedLimo}
+                                        isLoading={isLoading}
+                                    />
+                                )}
+                            </form>
+                        </>
+                    )}
+                </div>
+            </Modal>
+            {/* Error Modal */}
+            {apiError && (
+                <Modal
+                    isOpen={!!apiError}
+                    onRequestClose={() => setApiError(null)}
+                    className="modal"
+                    overlayClassName="modal-overlay"
+                    contentLabel="Error Message"
+                >
+                    <div className="bg-white rounded-xl p-6 max-w-md mx-auto">
+                        <div className="flex items-start">
+                            <div className="flex-shrink-0 text-red-500 mt-1">
+                                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div className="ml-4">
+                                <h3 className="text-lg font-bold text-gray-900">{apiError.title}</h3>
+                                <div className="mt-2 text-sm text-gray-600">
+                                    <p>{apiError.message}</p>
+                                    {apiError.details && <p className="mt-2 text-gray-500">{apiError.details}</p>}
+                                </div>
+                                <div className="mt-4">
+                                    <button
+                                        type="button"
+                                        className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                                        onClick={() => setApiError(null)}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )}
+        </>
     );
 };
 

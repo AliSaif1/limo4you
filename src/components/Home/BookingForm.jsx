@@ -697,7 +697,7 @@ const BookingForm = () => {
     setApiError(null);
 
     try {
-      const bookingsRef = collection(db, 'bookings');
+      const bookingsRef = collection(db, 'reservations');
       await addDoc(bookingsRef, {
         ...formData,
         duration: MINIMUM_DURATION,
