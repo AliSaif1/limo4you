@@ -668,6 +668,7 @@ const BookingForm = () => {
   const [errors, setErrors] = useState({});
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [apiError, setApiError] = useState(null);
 
   // Fetch booked slots when date changes
   useEffect(() => {
@@ -692,6 +693,8 @@ const BookingForm = () => {
   const handleSubmit = async () => {
     setShowConfirmation(false);
     setLoading(true);
+    setShowSuccess(false);
+    setApiError(null);
 
     try {
       const bookingsRef = collection(db, 'bookings');
@@ -703,8 +706,8 @@ const BookingForm = () => {
         status: 'booked',
         endTime: calculateEndTime(formData.time)
       });
-      
-      await fetch('/api/send-email', {
+
+      const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -718,6 +721,12 @@ const BookingForm = () => {
           passengers: formData.passengers
         }),
       });
+
+      const emailResult = await response.json();
+
+      if (!response.ok || !emailResult.success) {
+        throw new Error(emailResult.error || 'Email sending failed');
+      }
 
       // ✅ Reset form
       setShowSuccess(true);
@@ -737,7 +746,12 @@ const BookingForm = () => {
       setStep(1);
       setErrors({});
     } catch (error) {
-      alert(error.message || "Reservation failed. Please try again.");
+      console.error('Submit error:', error);
+      setApiError({
+        title: "Reservation Failed",
+        message: error.message || "An unexpected error occurred. Please try again.",
+        details: error.details || null
+      });
     } finally {
       setLoading(false);
     }
@@ -893,6 +907,38 @@ const BookingForm = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Error Modal */}
+      {apiError && (
+        <>
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setApiError(null)}></div>
+          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-full max-w-md">
+            <div className="flex items-start">
+              <div className="flex-shrink-0 text-red-500">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-medium text-gray-900">{apiError.title}</h3>
+                <div className="mt-2 text-sm text-gray-500">
+                  <p>{apiError.message}</p>
+                  {apiError.details && <p className="mt-2 text-gray-400">{apiError.details}</p>}
+                </div>
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    onClick={() => setApiError(null)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
