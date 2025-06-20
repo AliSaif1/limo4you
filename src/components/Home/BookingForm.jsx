@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Calendar, Clock, MapPin, User, ChevronLeft, Car, Smartphone, Mail, X } from 'lucide-react';
+import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
 
 // Constants
 const VEHICLE_TYPES = [
-  { id: 'sedan', name: 'Sedan', capacity: 3, icon: '🚗', price: 120 },
-  { id: 'suv', name: 'SUV', capacity: 6, icon: '🚙', price: 150 },
-  { id: 'stretch-limo', name: 'Stretch Limousine', capacity: 10, icon: '🚘', price: 300 },
-  { id: 'party-limo', name: 'Party Limousine', capacity: 14, icon: '🎉', price: 400 }
+  { id: 'sedan', name: 'Sedan', capacity: 3, icon: '🚗', price: 75 },
+  { id: 'suv', name: 'SUV', capacity: 6, icon: '🚙', price: 100 },
+  { id: 'stretch-limo', name: 'Stretch Limousine', capacity: 10, icon: '🚘', price: 150 },
+  { id: 'party-limo', name: 'Party Limousine', capacity: 14, icon: '🎉', price: 200 }
 ];
 
 const MINIMUM_DURATION = 3; // 3 hours minimum
@@ -216,16 +217,15 @@ const DateTimeSelection = ({ formData, setFormData, errors, onNext, onBack }) =>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Time Slot</label>
           <div className="relative">
-            <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+            <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10" size={20} />
             <select
               name="slot"
               value={formData.time}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all appearance-none bg-[...]"
               disabled={!formData.date}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent appearance-none bg-white text-gray-800"
             >
               <option value="">{!formData.date ? 'Select date first' : 'Select time'}</option>
-
               {availableSlots.length > 0 ? (
                 availableSlots.map((slot, index) => (
                   <option key={index} value={slot}>{slot}</option>
@@ -235,6 +235,7 @@ const DateTimeSelection = ({ formData, setFormData, errors, onNext, onBack }) =>
               )}
             </select>
           </div>
+
           {errors.time && <p className="text-red-500 text-xs mt-1">{errors.time}</p>}
         </div>
       </div>
@@ -707,16 +708,7 @@ const BookingForm = () => {
     setApiError(null);
 
     try {
-      const bookingsRef = collection(db, 'reservations');
-      await addDoc(bookingsRef, {
-        ...formData,
-        duration: MINIMUM_DURATION,
-        passengers: parseInt(formData.passengers),
-        createdAt: new Date(),
-        status: 'booked',
-        endTime: calculateEndTime(formData.time)
-      });
-
+      // Try to send email first (critical operation)
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -732,13 +724,22 @@ const BookingForm = () => {
         }),
       });
 
-      const emailResult = await response.json();
-
-      if (!response.ok || !emailResult.success) {
-        throw new Error(emailResult.error || 'Email sending failed');
+      if (!response.ok) {
+        throw new Error('Email failed');
       }
 
-      // ✅ Reset form
+      // Only save to Firebase if email succeeded (backup only)
+      const bookingsRef = collection(db, 'reservations');
+      await addDoc(bookingsRef, {
+        ...formData,
+        duration: MINIMUM_DURATION,
+        passengers: parseInt(formData.passengers),
+        createdAt: new Date(),
+        status: 'booked',
+        endTime: calculateEndTime(formData.time)
+      });
+
+      // Success - reset form
       setShowSuccess(true);
       setFormData({
         vehicleType: '',
@@ -754,13 +755,11 @@ const BookingForm = () => {
         phone: ''
       });
       setStep(1);
-      setErrors({});
+
     } catch (error) {
-      console.error('Submit error:', error);
       setApiError({
-        title: "Reservation Failed",
-        message: error.message || "An unexpected error occurred. Please try again.",
-        details: error.details || null
+        title: "Booking Failed",
+        message: "We couldn't process your booking. Please try again."
       });
     } finally {
       setLoading(false);
@@ -919,36 +918,27 @@ const BookingForm = () => {
         </div>
       )}
 
-      {/* Error Modal */}
+      {/* Single Error Modal */}
       {apiError && (
-        <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={() => setApiError(null)}></div>
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl z-50 w-full max-w-md">
-            <div className="flex items-start">
-              <div className="flex-shrink-0 text-red-500">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                <ExclamationCircleIcon className="h-6 w-6 text-red-600" />
               </div>
-              <div className="ml-4">
-                <h3 className="text-lg font-medium text-gray-900">{apiError.title}</h3>
-                <div className="mt-2 text-sm text-gray-500">
-                  <p>{apiError.message}</p>
-                  {apiError.details && <p className="mt-2 text-gray-400">{apiError.details}</p>}
-                </div>
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                    onClick={() => setApiError(null)}
-                  >
-                    Close
-                  </button>
-                </div>
+              <h3 className="mt-3 text-lg font-medium text-gray-900">{apiError.title}</h3>
+              <p className="mt-2 text-gray-600">{apiError.message}</p>
+              <div className="mt-4">
+                <button
+                  onClick={() => setApiError(null)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                >
+                  Try Again
+                </button>
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

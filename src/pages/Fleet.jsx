@@ -363,15 +363,7 @@ const Fleet = () => {
     setApiError(null);
 
     try {
-      // Save to Firestore
-      await addDoc(collection(db, 'reservations'), {
-        vehicleType: selectedLimo.name,
-        ...formData,
-        createdAt: new Date(),
-        status: 'pending'
-      });
-
-      // Send email notification
+      // First try to send the email (critical operation)
       const response = await fetch('/api/send-quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -388,19 +380,23 @@ const Fleet = () => {
         }),
       });
 
-      const result = await response.json();
-
       if (!response.ok) {
-        throw new Error(result.message || 'Failed to send confirmation email');
+        throw new Error('email_failed');
       }
+
+      // Only save to Firestore if email succeeded (backup only)
+      await addDoc(collection(db, 'reservations'), {
+        vehicleType: selectedLimo.name,
+        ...formData,
+        createdAt: new Date(),
+        status: 'pending'
+      });
 
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Reservation error:', error);
       setApiError({
-        title: "Reservation Failed",
-        message: error.message || "There was an error processing your reservation.",
-        details: "Please try again or contact support if the problem persists."
+        title: "Oops! Something went wrong",
+        message: "We couldn't complete your reservation. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -857,7 +853,6 @@ const Fleet = () => {
                 <h3 className="text-lg font-bold text-gray-900">{apiError.title}</h3>
                 <div className="mt-2 text-sm text-gray-600">
                   <p>{apiError.message}</p>
-                  {apiError.details && <p className="mt-2 text-gray-500">{apiError.details}</p>}
                 </div>
                 <div className="mt-4">
                   <button

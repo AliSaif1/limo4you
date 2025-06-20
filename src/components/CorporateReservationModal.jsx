@@ -113,15 +113,7 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
         setApiError(null);
 
         try {
-            // Save to Firestore
-            await addDoc(collection(db, 'reservations'), {
-                vehicleType: selectedLimo.name,
-                ...formData,
-                createdAt: new Date(),
-                status: 'pending'
-            });
-
-            // Send email notification
+            // First try to send the email (only critical operation)
             const response = await fetch('/api/send-quote', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -141,16 +133,24 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
             const result = await response.json();
 
             if (!response.ok) {
-                throw new Error(result.message || 'Failed to send confirmation email');
+                throw new Error('email_failed');
             }
+
+            // Only save to Firestore if email succeeds
+            await addDoc(collection(db, 'reservations'), {
+                vehicleType: selectedLimo.name,
+                ...formData,
+                createdAt: new Date(),
+                status: 'pending'
+            });
 
             setIsSubmitted(true);
         } catch (error) {
             console.error('Reservation error:', error);
             setApiError({
-                title: "Reservation Failed",
-                message: error.message || "There was an error processing your reservation.",
-                details: "Please try again or contact support if the problem persists."
+                title: "Reservation Not Completed",
+                message: "We couldn't process your reservation due to a system error.",
+                details: "Please try again or contact our support team directly to complete your booking."
             });
         } finally {
             setIsLoading(false);
@@ -237,6 +237,7 @@ const ReservationModal = ({ isOpen, onClose, selectedLimo }) => {
                     )}
                 </div>
             </Modal>
+
             {/* Error Modal */}
             {apiError && (
                 <Modal

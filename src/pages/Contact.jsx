@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Mail, Clock, Send, Loader2, ShieldCheck, Star, Calendar, Headset, MapPin, Car, Plane } from 'lucide-react';
+import { Phone, Mail, Clock, Send, Loader2, AlertCircle, X, CheckCircle, ShieldCheck, Star, Calendar, Headset, MapPin, Car, Plane } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 import { useLocation } from 'react-router-dom';
 
@@ -109,6 +109,40 @@ const BusinessHoursCard = () => (
   </div>
 );
 
+const AlertModal = ({ type, message, onClose }) => {
+  const isSuccess = type === 'success';
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
+          <X size={24} />
+        </button>
+        <div className="text-center">
+          {isSuccess ? (
+            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+          ) : (
+            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          )}
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            {isSuccess ? 'Thank You!' : 'Oops! Something went wrong'}
+          </h3>
+          <p className="text-gray-600 mb-6">{message}</p>
+          <button
+            onClick={onClose}
+            className={`${isSuccess ? 'bg-primary hover:bg-primary-dark' : 'bg-red-500 hover:bg-red-600'} text-white font-medium py-2 px-6 rounded-lg transition-all`}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -117,7 +151,9 @@ const ContactForm = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('success');
+  const [modalMessage, setModalMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -130,7 +166,6 @@ const ContactForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setSubmitStatus(null);
 
     try {
       const response = await fetch('/api/send-contact', {
@@ -144,32 +179,44 @@ const ContactForm = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        // Handle API validation errors (user-facing)
+        const errorMessage = data.error || 'Please check your information and try again.';
+        setModalType('error');
+        setModalMessage(errorMessage);
+        setShowModal(true);
+        return;
       }
 
-      setSubmitStatus({ success: true, message: 'Message sent successfully!' });
-      setFormData({ name: '', email: '', phone: '', message: '' }); // Reset form
+      // Success case
+      setModalType('success');
+      setModalMessage('Your message has been sent successfully. We will get back to you soon!');
+      setShowModal(true);
+      setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (error) {
-      setSubmitStatus({ success: false, message: error.message });
+      // Only show network errors to user (user-facing)
+      if (error.message.includes('Failed to fetch')) {
+        setModalType('error');
+        setModalMessage('Network error: Please check your internet connection and try again.');
+        setShowModal(true);
+      } else {
+        // Log other technical errors but don't show them to user
+        console.error('Form submission error:', error);
+        setModalType('error');
+        setModalMessage('An unexpected error occurred. Please try again later.');
+        setShowModal(true);
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+    <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 relative">
       <h2 className="text-2xl font-bold text-primary mb-8 font-serif relative pb-4 after:absolute after:bottom-0 after:left-0 after:w-16 after:h-1 after:bg-secondary">
         Send Us a Message
       </h2>
 
-      {submitStatus && (
-        <div className={`mb-6 p-4 rounded-lg ${submitStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-          {submitStatus.message}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-6" itemScope itemType="https://schema.org/ContactPage">
-        {/* Rest of your form fields remain the same */}
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -257,6 +304,15 @@ const ContactForm = () => {
           )}
         </button>
       </form>
+
+      {/* Modal for all user-facing messages */}
+      {showModal && (
+        <AlertModal
+          type={modalType}
+          message={modalMessage}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };
