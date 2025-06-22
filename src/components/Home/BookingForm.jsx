@@ -6,14 +6,33 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
 
 // Constants
 const VEHICLE_TYPES = [
-  { id: 'suv', name: 'SUV', capacity: 6, icon: '🚙', price: 100, originalPrice: 120 },
+  { id: 'suv', name: 'SUV', capacity: 6, icon: '🚙', hourlyPrice: 100, originalHourlyPrice: 120, originalKmPrice: 3, perKmPrice: 2.5 },
 ];
 
-// Add this with the other constants at the top of the file
+const SERVICE_TYPES = [
+  { id: 'event', name: 'Event Service', pricingType: 'hourly' },
+  { id: 'airport', name: 'Airport Pickup', pricingType: 'flat' },
+  { id: 'city', name: 'City to City', pricingType: 'distance' },
+];
+
 const AIRPORT_OPTIONS = [
   { id: 'yyz', name: 'Toronto Pearson International Airport (YYZ)', price: 120, originalPrice: 140 },
   { id: 'ytz', name: 'Billy Bishop Toronto City Airport (YTZ)', price: 100, originalPrice: 120 },
   { id: 'yhm', name: 'John C. Munro Hamilton International Airport (YHM)', price: 150, originalPrice: 170 },
+];
+
+// List of Ontario cities for validation
+const ONTARIO_CITIES = [
+  'Toronto', 'Ottawa', 'Mississauga', 'Brampton', 'Hamilton', 'London', 'Markham', 'Vaughan',
+  'Kitchener', 'Windsor', 'Richmond Hill', 'Oakville', 'Burlington', 'Greater Sudbury', 'Oshawa',
+  'Barrie', 'St. Catharines', 'Cambridge', 'Kingston', 'Whitby', 'Guelph', 'Ajax', 'Thunder Bay',
+  'Waterloo', 'Chatham-Kent', 'Pickering', 'Niagara Falls', 'Peterborough', 'Sarnia', 'Newmarket',
+  'Aurora', 'Welland', 'North Bay', 'Belleville', 'Cornwall', 'Timmins', 'Quinte West', 'Woodstock',
+  'Brantford', 'Tecumseh', 'St. Thomas', 'Leamington', 'Bradford West Gwillimbury', 'Orangeville',
+  'Stratford', 'Orillia', 'Fort Erie', 'Collingwood', 'Wasaga Beach', 'Kawartha Lakes', 'Clarence-Rockland',
+  'Owen Sound', 'Georgina', 'Uxbridge', 'Innisfil', 'Dryden', 'Elliot Lake', 'Temiskaming Shores',
+  'Amherstburg', 'Essex', 'Lakeshore', 'LaSalle', 'Tilsonburg', 'Huntsville', 'Bracebridge', 'Gravenhurst',
+  'Parry Sound', 'Kenora', 'Penetanguishene', 'Midland', 'Port Colborne', 'Wellesley', 'Woolwich'
 ];
 
 const MINIMUM_DURATION = 3; // 3 hours minimum
@@ -41,6 +60,20 @@ const getOntarioDateTime = () => {
   return new Date(
     `${getPart('year')}-${getPart('month')}-${getPart('day')}T${getPart('hour')}:${getPart('minute')}:${getPart('second')}`
   );
+};
+
+// Returns Ontario-local date string (e.g., "2025-06-22") for <input min>
+const getOntarioDateOnlyString = () => {
+  const now = new Date();
+
+  const options = {
+    timeZone: 'America/Toronto',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  };
+
+  return new Intl.DateTimeFormat('en-CA', options).format(now);
 };
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
@@ -77,6 +110,39 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Helper function to calculate distance using Google Maps API
+const calculateDistance = async (origin, destination) => {
+  try {
+    // Mock response for testing
+    if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY || process.env.NODE_ENV === 'test') {
+      return { distance: 100, duration: '45 mins' }; // Default mock distance of 50km
+    }
+
+    const directionsService = new window.google.maps.DirectionsService();
+    const response = await directionsService.route({
+      origin: origin,
+      destination: destination,
+      travelMode: window.google.maps.TravelMode.DRIVING,
+    });
+
+    const distance = response.routes[0].legs[0].distance.value / 1000; // Convert meters to km
+    const duration = response.routes[0].legs[0].duration.text;
+
+    return { distance, duration };
+  } catch (error) {
+    console.error('Error calculating distance:', error);
+    return { distance: 0, duration: '' };
+  }
+};
+
+// Helper function to validate if pickup is in Ontario
+const validateOntarioPickup = (pickupLocation) => {
+  if (!pickupLocation) return false;
+  return ONTARIO_CITIES.some(city =>
+    pickupLocation.toLowerCase().includes(city.toLowerCase())
   );
 };
 
@@ -158,46 +224,42 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAirportPickupChange = (e) => {
-    const isAirportPickup = e.target.value === 'yes';
-    setFormData(prev => ({ ...prev, isAirportPickup }));
+  const handleServiceTypeChange = (e) => {
+    const serviceType = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      serviceType,
+      isAirportPickup: serviceType === 'airport',
+      distance: serviceType === 'city' ? prev.distance : 0
+    }));
   };
 
   return (
     <div className="mb-8">
       <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
         <Car className="text-primary" size={24} />
-        <span>1. Vehicle & Time</span>
+        <span>1. Service & Time</span>
       </h2>
 
       <div className="space-y-6">
-        {/* Airport Pickup Question */}
+        {/* Service Type Selection */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Is it Airport pick up?</h3>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="isAirportPickup"
-                value="yes"
-                checked={formData.isAirportPickup === true}
-                onChange={handleAirportPickupChange}
-                className="h-4 w-4 text-primary focus:ring-primary"
-              />
-              Yes
-            </label>
-            <label className="flex items-center gap-2">
-              <input
-                type="radio"
-                name="isAirportPickup"
-                value="no"
-                checked={formData.isAirportPickup === false}
-                onChange={handleAirportPickupChange}
-                className="h-4 w-4 text-primary focus:ring-primary"
-              />
-              No
-            </label>
-          </div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">Service Type</h3>
+          <select
+            name="serviceType"
+            value={formData.serviceType || ''}
+            onChange={handleServiceTypeChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800"
+            required
+          >
+            <option value="">Select service type</option>
+            {SERVICE_TYPES.map(service => (
+              <option key={service.id} value={service.id}>
+                {service.name}
+              </option>
+            ))}
+          </select>
+          {errors.serviceType && <p className="text-red-500 text-xs mt-2">{errors.serviceType}</p>}
         </div>
 
         {/* Vehicle Selection */}
@@ -225,9 +287,19 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
                   <div className="font-semibold text-gray-800">{vehicle.name}</div>
                   <div className="text-sm text-gray-500">{vehicle.capacity} passengers max</div>
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-sm line-through text-gray-500">${vehicle.originalPrice}/hr</span>
-                  <span className="text-lg font-semibold text-primary">${vehicle.price}/hr</span>
+                <div className="flex flex-col items-center mt-1">
+                  {formData.serviceType === 'city' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm line-through text-gray-500">${vehicle.originalKmPrice}/km</span>
+                      <span className="text-sm font-semibold text-primary">${vehicle.perKmPrice}/km</span>
+                    </div>
+                  )}
+                  {formData.serviceType !== 'city' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm line-through text-gray-500">${vehicle.originalHourlyPrice}/hr</span>
+                      <span className="text-sm font-semibold text-primary">${vehicle.hourlyPrice}/hr</span>
+                    </div>
+                  )}
                 </div>
               </button>
             ))}
@@ -238,7 +310,7 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
         {/* Date Selection */}
         <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {formData.isAirportPickup ? 'Arrival Date' : 'Date'}
+            {formData.serviceType === 'airport' ? 'Arrival Date' : 'Date'}
           </h3>
           <div className="relative">
             <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
@@ -249,7 +321,7 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
                 }`}
               value={formData.date}
               onChange={handleInputChange}
-              min={getOntarioDateTime().toISOString().split('T')[0]} // ✅ Uses Ontario-local date as minimum
+              min={getOntarioDateOnlyString()} // ✅ Correct Ontario-local date
               required
             />
           </div>
@@ -257,16 +329,18 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
           {errors.date && <p className="text-red-500 text-xs mt-1">{errors.date}</p>}
 
           <p className="text-xs text-gray-500 mt-1">
-            {formData.date && new Date(formData.date).toDateString() === new Date(getOntarioDateTime()).toDateString()
+            {formData.date &&
+              new Date(formData.date).toDateString() === getOntarioDateTime().toDateString()
               ? `Pickup time must be at least ${MINIMUM_PREPARATION_HOURS} hours from now`
               : 'Select your pickup date'}
           </p>
         </div>
 
+
         {/* Pickup Time Selection */}
         <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {formData.isAirportPickup ? 'Arrival Time' : 'Pickup Time'}
+            {formData.serviceType === 'airport' ? 'Arrival Time' : 'Pickup Time'}
           </h3>
           <div className="relative">
             <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10" size={20} />
@@ -290,13 +364,14 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
           {errors.pickupTime && <p className="text-red-500 text-xs mt-1">{errors.pickupTime}</p>}
         </div>
 
-        {/* Dropoff Time Selection */}
+        {/* Dropoff Time Selection or Flight Number */}
         <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {formData.isAirportPickup ? 'Flight Number' : 'Dropoff Time'}
+            {formData.serviceType === 'airport' ? 'Flight Number' :
+              formData.serviceType === 'event' ? 'Dropoff Time' : 'Distance'}
           </h3>
           <div className="relative">
-            {formData.isAirportPickup ? (
+            {formData.serviceType === 'airport' ? (
               <>
                 <Plane className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
                 <input
@@ -309,7 +384,7 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
                   onChange={handleInputChange}
                 />
               </>
-            ) : (
+            ) : formData.serviceType === 'event' ? (
               <>
                 <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none z-10" size={20} />
                 <select
@@ -329,11 +404,18 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
                   )}
                 </select>
               </>
+            ) : (
+              <>
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <div className="w-full pl-10 pr-4 py-3 text-gray-500">
+                  Distance will be calculated after entering pickup and destination
+                </div>
+              </>
             )}
           </div>
-          {errors.dropoffTime && !formData.isAirportPickup && <p className="text-red-500 text-xs mt-1">{errors.dropoffTime}</p>}
-          {errors.flightNumber && formData.isAirportPickup && <p className="text-red-500 text-xs mt-1">{errors.flightNumber}</p>}
-          {formData.pickupTime && formData.dropoffTime && !formData.isAirportPickup && (
+          {errors.dropoffTime && formData.serviceType === 'event' && <p className="text-red-500 text-xs mt-1">{errors.dropoffTime}</p>}
+          {errors.flightNumber && formData.serviceType === 'airport' && <p className="text-red-500 text-xs mt-1">{errors.flightNumber}</p>}
+          {formData.pickupTime && formData.dropoffTime && formData.serviceType === 'event' && (
             <p className="text-xs text-gray-500 mt-1">
               Duration: {calculateDuration(formData.pickupTime, formData.dropoffTime)} hours
             </p>
@@ -344,17 +426,20 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
           <button
             onClick={onNext}
             disabled={
+              !formData.serviceType ||
               !formData.vehicleType ||
               !formData.date ||
               !formData.pickupTime ||
-              (!formData.isAirportPickup && !formData.dropoffTime) ||
-              (formData.isAirportPickup && !formData.flightNumber)
+              (formData.serviceType === 'event' && !formData.dropoffTime) ||
+              (formData.serviceType === 'airport' && !formData.flightNumber)
             }
-            className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.vehicleType ||
+            className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.serviceType ||
+              !formData.vehicleType ||
               !formData.date ||
               !formData.pickupTime ||
-              (!formData.isAirportPickup && !formData.dropoffTime) ||
-              (formData.isAirportPickup && !formData.flightNumber) ? 'opacity-50 cursor-not-allowed' : ''
+              (formData.serviceType === 'event' && !formData.dropoffTime) ||
+              (formData.serviceType === 'airport' && !formData.flightNumber)
+              ? 'opacity-50 cursor-not-allowed' : ''
               }`}
           >
             Next
@@ -370,10 +455,43 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
   const [showDestinationSuggestions, setShowDestinationSuggestions] = useState(false);
+  const [pickupValidation, setPickupValidation] = useState({ isValid: true, message: '' });
+  const [distanceInfo, setDistanceInfo] = useState(null);
+  const [distanceLoading, setDistanceLoading] = useState(false);
+
+  // Calculate distance when service type is city-to-city and both locations are entered
+  useEffect(() => {
+    if (formData.serviceType === 'city' && formData.pickup && formData.destination) {
+      calculateDistanceAndUpdate();
+    }
+  }, [formData.serviceType, formData.pickup, formData.destination]);
+
+  const calculateDistanceAndUpdate = async () => {
+    setDistanceLoading(true);
+    try {
+      const { distance, duration } = await calculateDistance(formData.pickup, formData.destination);
+      setDistanceInfo({ distance, duration });
+      setFormData(prev => ({ ...prev, distance }));
+    } catch (error) {
+      console.error('Failed to calculate distance:', error);
+      setDistanceInfo(null);
+    } finally {
+      setDistanceLoading(false);
+    }
+  };
 
   const handleLocationInput = async (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Validate Ontario pickup for city-to-city service
+    if (name === 'pickup' && formData.serviceType === 'city') {
+      const isValid = validateOntarioPickup(value);
+      setPickupValidation({
+        isValid,
+        message: isValid ? '' : 'Pickup must be within Ontario, Canada'
+      });
+    }
 
     // Clear suggestions if input is too short
     if (value.length <= 2) {
@@ -405,9 +523,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         return;
       }
 
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${value}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
-      );
+      const response = await fetch(`/api/places?input=${value}`);
 
       if (!response.ok) throw new Error('API request failed');
 
@@ -439,6 +555,14 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
     setFormData(prev => ({ ...prev, [field]: suggestion.description }));
     if (field === 'pickup') {
       setShowPickupSuggestions(false);
+      // Validate Ontario pickup after selection
+      if (formData.serviceType === 'city') {
+        const isValid = validateOntarioPickup(suggestion.description);
+        setPickupValidation({
+          isValid,
+          message: isValid ? '' : 'Pickup must be within Ontario, Canada'
+        });
+      }
     } else {
       setShowDestinationSuggestions(false);
     }
@@ -468,9 +592,9 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         {/* Pickup Location */}
         <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {formData.isAirportPickup ? 'Arrival Airport' : 'Pickup Location'}
+            {formData.serviceType === 'airport' ? 'Arrival Airport' : 'Pickup Location'}
           </h3>
-          {formData.isAirportPickup ? (
+          {formData.serviceType === 'airport' ? (
             <select
               name="pickup"
               value={formData.pickup}
@@ -493,7 +617,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
                 type="text"
                 name="pickup"
                 placeholder="Enter pickup address"
-                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800 ${errors.pickup ? 'border-red-500' : 'border-gray-300'
+                className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800 ${errors.pickup || !pickupValidation.isValid ? 'border-red-500' : 'border-gray-300'
                   }`}
                 value={formData.pickup}
                 onChange={handleLocationInput}
@@ -514,9 +638,12 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
                   ))}
                 </div>
               )}
+              {!pickupValidation.isValid && (
+                <p className="text-red-500 text-xs mt-1">{pickupValidation.message}</p>
+              )}
+              {errors.pickup && <p className="text-red-500 text-xs mt-1">{errors.pickup}</p>}
             </div>
           )}
-          {errors.pickup && <p className="text-red-500 text-xs mt-1">{errors.pickup}</p>}
         </div>
 
         {/* Destination */}
@@ -534,7 +661,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
               onChange={handleLocationInput}
               onFocus={() => setShowDestinationSuggestions(true)}
               onBlur={() => setTimeout(() => setShowDestinationSuggestions(false), 200)}
-              required
+              required={formData.serviceType !== 'airport'}
             />
             {showDestinationSuggestions && destinationSuggestions.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
@@ -552,6 +679,27 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
           </div>
           {errors.destination && <p className="text-red-500 text-xs mt-1">{errors.destination}</p>}
         </div>
+
+        {/* Distance Display for City-to-City Service */}
+        {formData.serviceType === 'city' && (
+          <div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-3">Distance</h3>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              {distanceLoading ? (
+                <div className="w-full pl-10 pr-4 py-2 text-gray-500">Calculating distance...</div>
+              ) : distanceInfo ? (
+                <div className="w-full pl-10 pr-4 py-2 text-gray-800">
+                  {distanceInfo.distance.toFixed(1)} km ({distanceInfo.duration})
+                </div>
+              ) : (
+                <div className="w-full pl-10 pr-4 py-2 text-gray-500">
+                  Enter both pickup and destination to calculate distance
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Passengers */}
         <div>
@@ -582,8 +730,15 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         </button>
         <button
           onClick={onNext}
-          disabled={!formData.pickup || !formData.destination}
-          className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.pickup || !formData.destination ? 'opacity-50 cursor-not-allowed' : ''
+          disabled={
+            !formData.pickup ||
+            (formData.serviceType !== 'airport' && !formData.destination) ||
+            (formData.serviceType === 'city' && !pickupValidation.isValid)
+          }
+          className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.pickup ||
+            (formData.serviceType !== 'airport' && !formData.destination) ||
+            (formData.serviceType === 'city' && !pickupValidation.isValid)
+            ? 'opacity-50 cursor-not-allowed' : ''
             }`}
         >
           Next
@@ -719,15 +874,32 @@ const ContactDetails = ({ formData, setFormData, setErrors, errors, onNext, onBa
 
 const ReservationSummary = ({ formData, onSubmit, onBack }) => {
   const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
-  const selectedAirport = formData.isAirportPickup
+  const selectedAirport = formData.serviceType === 'airport'
     ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
     : null;
+  const selectedService = SERVICE_TYPES.find(s => s.id === formData.serviceType);
 
-  const duration = formData.isAirportPickup ? 1 : calculateDuration(formData.pickupTime, formData.dropoffTime);
+  const duration = formData.serviceType === 'event'
+    ? calculateDuration(formData.pickupTime, formData.dropoffTime)
+    : 1;
 
-  const totalPrice = formData.isAirportPickup
-    ? (selectedAirport?.price || 0)
-    : (selectedVehicle?.price || 0) * duration;
+  let totalPrice = 0;
+  let originalPrice = 0;
+  let pricingDescription = '';
+
+  if (formData.serviceType === 'airport') {
+    totalPrice = selectedAirport?.price || 0;
+    originalPrice = selectedAirport?.originalPrice || 0;
+    pricingDescription = 'Flat rate';
+  } else if (formData.serviceType === 'event') {
+    totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
+    originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
+    pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
+  } else if (formData.serviceType === 'city') {
+    totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
+    originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
+    pricingDescription = `${(formData.distance || 0).toFixed(1)} km × $${selectedVehicle?.perKmPrice}/km`;
+  }
 
   return (
     <div className="mb-8">
@@ -749,6 +921,13 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
 
         <div className="space-y-3 text-gray-600 mb-6 text-sm">
           <p className="flex justify-between">
+            <span>Service Type:</span>
+            <span className="font-medium text-gray-800">
+              {selectedService?.name || 'Not selected'}
+            </span>
+          </p>
+
+          <p className="flex justify-between">
             <span>Vehicle:</span>
             <span className="font-medium text-gray-800">
               {selectedVehicle?.name || 'Not selected'}
@@ -757,7 +936,7 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
 
           {formData.date && (
             <p className="flex justify-between">
-              <span>{formData.isAirportPickup ? 'Arrival Date' : 'Date'}:</span>
+              <span>{formData.serviceType === 'airport' ? 'Arrival Date' : 'Date'}:</span>
               <span className="font-medium text-gray-800">
                 {new Date(formData.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
               </span>
@@ -766,14 +945,14 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
 
           {formData.pickupTime && (
             <p className="flex justify-between">
-              <span>{formData.isAirportPickup ? 'Arrival Time' : 'Pickup Time'}:</span>
+              <span>{formData.serviceType === 'airport' ? 'Arrival Time' : 'Pickup Time'}:</span>
               <span className="font-medium text-gray-800">
                 {formData.pickupTime}
               </span>
             </p>
           )}
 
-          {formData.isAirportPickup && formData.flightNumber && (
+          {formData.serviceType === 'airport' && formData.flightNumber && (
             <p className="flex justify-between">
               <span>Flight Number:</span>
               <span className="font-medium text-gray-800">
@@ -782,7 +961,7 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
             </p>
           )}
 
-          {!formData.isAirportPickup && formData.dropoffTime && (
+          {formData.serviceType === 'event' && formData.dropoffTime && (
             <p className="flex justify-between">
               <span>Dropoff Time:</span>
               <span className="font-medium text-gray-800">
@@ -791,11 +970,20 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
             </p>
           )}
 
-          {!formData.isAirportPickup && formData.pickupTime && formData.dropoffTime && (
+          {formData.serviceType === 'event' && formData.pickupTime && formData.dropoffTime && (
             <p className="flex justify-between">
               <span>Duration:</span>
               <span className="font-medium text-gray-800">
                 {duration} hours
+              </span>
+            </p>
+          )}
+
+          {formData.serviceType === 'city' && formData.distance && (
+            <p className="flex justify-between">
+              <span>Distance:</span>
+              <span className="font-medium text-gray-800">
+                {formData.distance.toFixed(1)} km
               </span>
             </p>
           )}
@@ -808,7 +996,7 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
           </p>
 
           <p className="flex justify-between">
-            <span>{formData.isAirportPickup ? 'Arrival Airport' : 'Pickup'}:</span>
+            <span>{formData.serviceType === 'airport' ? 'Arrival Airport' : 'Pickup'}:</span>
             <span className="font-medium text-gray-800">
               {formData.pickup}
             </span>
@@ -843,18 +1031,20 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
           </p>
         </div>
 
-        {(formData.isAirportPickup ? selectedAirport?.price : selectedVehicle?.price) > 0 && (
+        {totalPrice > 0 && (
           <div className="border-t border-gray-200 pt-4 mb-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium text-gray-700">Pricing:</span>
+              <span className="text-gray-600 text-sm">{pricingDescription}</span>
+            </div>
             <div className="flex justify-between items-center">
               <span className="font-bold text-gray-800">Estimated Price:</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm line-through text-gray-500">
-                  ${formData.isAirportPickup
-                    ? selectedAirport?.originalPrice
-                    : selectedVehicle?.originalPrice * duration}
+                  ${originalPrice.toFixed(2)}
                 </span>
                 <span className="font-bold text-primary text-lg">
-                  ${totalPrice}
+                  ${totalPrice.toFixed(2)}
                 </span>
               </div>
             </div>
@@ -888,21 +1078,41 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
 
 const BookingSummary = ({ formData }) => {
   const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
-  const selectedAirport = formData.isAirportPickup
+  const selectedAirport = formData.serviceType === 'airport'
     ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
     : null;
+  const selectedService = SERVICE_TYPES.find(s => s.id === formData.serviceType);
 
-  const duration = formData.isAirportPickup ? 1 : calculateDuration(formData.pickupTime, formData.dropoffTime);
+  const duration = formData.serviceType === 'event'
+    ? calculateDuration(formData.pickupTime, formData.dropoffTime)
+    : 1;
 
-  const totalPrice = formData.isAirportPickup
-    ? (selectedAirport?.price || 0)
-    : (selectedVehicle?.price || 0) * duration;
+  let totalPrice = 0;
+  let originalPrice = 0;
+
+  if (formData.serviceType === 'airport') {
+    totalPrice = selectedAirport?.price || 0;
+    originalPrice = selectedAirport?.originalPrice || 0;
+  } else if (formData.serviceType === 'event') {
+    totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
+    originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
+  } else if (formData.serviceType === 'city') {
+    totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
+    originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
+  }
 
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 sticky top-6">
       <h3 className="font-bold text-gray-800 text-lg mb-4 border-b pb-2">Reservation Summary</h3>
 
       <div className="space-y-3 text-gray-600 mb-6 text-sm">
+        <p className="flex justify-between">
+          <span>Service Type:</span>
+          <span className="font-medium text-gray-800">
+            {selectedService?.name || 'Not selected'}
+          </span>
+        </p>
+
         <p className="flex justify-between">
           <span>Vehicle:</span>
           <span className="font-medium text-gray-800">
@@ -912,7 +1122,7 @@ const BookingSummary = ({ formData }) => {
 
         {formData.date && (
           <p className="flex justify-between">
-            <span>{formData.isAirportPickup ? 'Arrival Date' : 'Date'}:</span>
+            <span>{formData.serviceType === 'airport' ? 'Arrival Date' : 'Date'}:</span>
             <span className="font-medium text-gray-800">
               {new Date(formData.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
             </span>
@@ -921,14 +1131,14 @@ const BookingSummary = ({ formData }) => {
 
         {formData.pickupTime && (
           <p className="flex justify-between">
-            <span>{formData.isAirportPickup ? 'Arrival Time' : 'Pickup Time'}:</span>
+            <span>{formData.serviceType === 'airport' ? 'Arrival Time' : 'Pickup Time'}:</span>
             <span className="font-medium text-gray-800">
               {formData.pickupTime}
             </span>
           </p>
         )}
 
-        {formData.isAirportPickup && formData.flightNumber && (
+        {formData.serviceType === 'airport' && formData.flightNumber && (
           <p className="flex justify-between">
             <span>Flight Number:</span>
             <span className="font-medium text-gray-800">
@@ -937,7 +1147,7 @@ const BookingSummary = ({ formData }) => {
           </p>
         )}
 
-        {!formData.isAirportPickup && formData.dropoffTime && (
+        {formData.serviceType === 'event' && formData.dropoffTime && (
           <p className="flex justify-between">
             <span>Dropoff Time:</span>
             <span className="font-medium text-gray-800">
@@ -946,11 +1156,20 @@ const BookingSummary = ({ formData }) => {
           </p>
         )}
 
-        {!formData.isAirportPickup && formData.pickupTime && formData.dropoffTime && (
+        {formData.serviceType === 'event' && formData.pickupTime && formData.dropoffTime && (
           <p className="flex justify-between">
             <span>Duration:</span>
             <span className="font-medium text-gray-800">
               {duration} hours
+            </span>
+          </p>
+        )}
+
+        {formData.serviceType === 'city' && formData.distance && (
+          <p className="flex justify-between">
+            <span>Distance:</span>
+            <span className="font-medium text-gray-800">
+              {formData.distance.toFixed(1)} km
             </span>
           </p>
         )}
@@ -963,18 +1182,16 @@ const BookingSummary = ({ formData }) => {
         </p>
       </div>
 
-      {(formData.isAirportPickup ? selectedAirport?.price : selectedVehicle?.price) > 0 && (
+      {totalPrice > 0 && (
         <div className="border-t border-gray-200 pt-4 mb-6">
           <div className="flex justify-between items-center">
             <span className="font-bold text-gray-800">Estimated Price:</span>
             <div className="flex items-center gap-2">
               <span className="text-sm line-through text-gray-500">
-                ${formData.isAirportPickup
-                  ? selectedAirport?.originalPrice
-                  : selectedVehicle?.originalPrice * duration}
+                ${originalPrice.toFixed(2)}
               </span>
               <span className="font-bold text-primary text-lg">
-                ${totalPrice}
+                ${totalPrice.toFixed(2)}
               </span>
             </div>
           </div>
@@ -1016,6 +1233,7 @@ function calculateDuration(startTime, endTime) {
 const BookingForm = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
+    serviceType: 'event',
     vehicleType: 'suv',
     pickup: '',
     destination: '',
@@ -1027,6 +1245,7 @@ const BookingForm = () => {
     name: '',
     email: '',
     phone: '',
+    distance: 0,
     isAirportPickup: false
   });
   const [loading, setLoading] = useState(false);
@@ -1043,24 +1262,43 @@ const BookingForm = () => {
 
     try {
       const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
-      const selectedAirport = formData.isAirportPickup
+      const selectedAirport = formData.serviceType === 'airport'
         ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
         : null;
-      const duration = formData.isAirportPickup ? 1 : calculateDuration(formData.pickupTime, formData.dropoffTime);
-      const totalPrice = formData.isAirportPickup
-        ? (selectedAirport?.price || 0)
-        : (selectedVehicle?.price || 0) * duration;
+
+      let totalPrice = 0;
+      let originalPrice = 0;
+      let pricingDescription = '';
+
+      if (formData.serviceType === 'airport') {
+        totalPrice = selectedAirport?.price || 0;
+        originalPrice = selectedAirport?.originalPrice || 0;
+        pricingDescription = 'Flat rate';
+      } else if (formData.serviceType === 'event') {
+        const duration = calculateDuration(formData.pickupTime, formData.dropoffTime);
+        totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
+        originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
+        pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
+      } else if (formData.serviceType === 'city') {
+        totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
+        originalPrice = totalPrice * 1.2; // Assuming 20% discount for original price display
+        pricingDescription = `${(formData.distance || 0).toFixed(1)} km × $${selectedVehicle?.perKmPrice}/km`;
+      }
 
       // Prepare data for API and Firebase
       const bookingData = {
         ...formData,
-        duration: duration,
+        duration: formData.serviceType === 'event'
+          ? calculateDuration(formData.pickupTime, formData.dropoffTime)
+          : 0,
         passengers: parseInt(formData.passengers),
         createdAt: new Date(),
         status: 'received',
         price: totalPrice,
-        originalPrice: selectedVehicle.originalPrice * duration,
-        discount: selectedVehicle.originalPrice * duration - totalPrice
+        originalPrice: originalPrice,
+        discount: originalPrice - totalPrice,
+        pricingDescription,
+        serviceTypeName: SERVICE_TYPES.find(s => s.id === formData.serviceType)?.name || ''
       };
 
       // Send to your API endpoint
@@ -1081,6 +1319,7 @@ const BookingForm = () => {
       // Success - reset form
       setShowSuccess(true);
       setFormData({
+        serviceType: '',
         vehicleType: 'suv',
         pickup: '',
         destination: '',
@@ -1092,6 +1331,7 @@ const BookingForm = () => {
         name: '',
         email: '',
         phone: '',
+        distance: 0,
         isAirportPickup: false
       });
       setStep(1);
@@ -1111,14 +1351,15 @@ const BookingForm = () => {
     let stepErrors = {};
 
     if (step === 1) {
+      if (!formData.serviceType) stepErrors.serviceType = 'Please select a service type';
       if (!formData.vehicleType) stepErrors.vehicleType = 'Please select a vehicle';
       if (!formData.date) stepErrors.date = 'Please select a date';
       if (!formData.pickupTime) stepErrors.pickupTime = 'Please select pickup time';
-      if (!formData.isAirportPickup && !formData.dropoffTime) stepErrors.dropoffTime = 'Please select dropoff time';
-      if (formData.isAirportPickup && !formData.flightNumber) stepErrors.flightNumber = 'Please enter flight number';
+      if (formData.serviceType === 'event' && !formData.dropoffTime) stepErrors.dropoffTime = 'Please select dropoff time';
+      if (formData.serviceType === 'airport' && !formData.flightNumber) stepErrors.flightNumber = 'Please enter flight number';
     } else if (step === 2) {
       if (!formData.pickup) stepErrors.pickup = 'Pickup location is required';
-      if (!formData.destination) stepErrors.destination = 'Destination is required';
+      if (formData.serviceType !== 'airport' && !formData.destination) stepErrors.destination = 'Destination is required';
     } else if (step === 3) {
       if (!formData.name) stepErrors.name = 'Name is required';
       if (!formData.email) stepErrors.email = 'Email is required';
