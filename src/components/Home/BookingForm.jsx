@@ -11,9 +11,9 @@ const VEHICLE_TYPES = [
 
 // Add this with the other constants at the top of the file
 const AIRPORT_OPTIONS = [
-  { id: 'yyz', name: 'Toronto Pearson International Airport (YYZ)', price: 120 },
-  { id: 'ytz', name: 'Billy Bishop Toronto City Airport (YTZ)', price: 100 },
-  { id: 'yhm', name: 'John C. Munro Hamilton International Airport (YHM)', price: 150 },
+  { id: 'yyz', name: 'Toronto Pearson International Airport (YYZ)', price: 120, originalPrice: 140 },
+  { id: 'ytz', name: 'Billy Bishop Toronto City Airport (YTZ)', price: 100, originalPrice: 120 },
+  { id: 'yhm', name: 'John C. Munro Hamilton International Airport (YHM)', price: 150, originalPrice: 170 },
 ];
 
 const MINIMUM_DURATION = 3; // 3 hours minimum
@@ -722,10 +722,12 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
   const selectedAirport = formData.isAirportPickup
     ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
     : null;
+
   const duration = formData.isAirportPickup ? 1 : calculateDuration(formData.pickupTime, formData.dropoffTime);
+
   const totalPrice = formData.isAirportPickup
-    ? (selectedAirport ? selectedAirport.price : 0)
-    : (selectedVehicle ? selectedVehicle.price * duration : 0);
+    ? (selectedAirport?.price || 0)
+    : (selectedVehicle?.price || 0) * duration;
 
   return (
     <div className="mb-8">
@@ -885,10 +887,12 @@ const BookingSummary = ({ formData }) => {
   const selectedAirport = formData.isAirportPickup
     ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
     : null;
+
   const duration = formData.isAirportPickup ? 1 : calculateDuration(formData.pickupTime, formData.dropoffTime);
+
   const totalPrice = formData.isAirportPickup
-    ? (selectedAirport ? selectedAirport.price : 0)
-    : (selectedVehicle ? selectedVehicle.price * duration : 0);
+    ? (selectedAirport?.price || 0)
+    : (selectedVehicle?.price || 0) * duration;
 
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 sticky top-6">
@@ -1031,8 +1035,13 @@ const BookingForm = () => {
 
     try {
       const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
+      const selectedAirport = formData.isAirportPickup
+        ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
+        : null;
       const duration = formData.isAirportPickup ? 1 : calculateDuration(formData.pickupTime, formData.dropoffTime);
-      const totalPrice = selectedVehicle ? selectedVehicle.price * duration : 0;
+      const totalPrice = formData.isAirportPickup
+        ? (selectedAirport?.price || 0)
+        : (selectedVehicle?.price || 0) * duration;
 
       // Prepare data for API and Firebase
       const bookingData = {
