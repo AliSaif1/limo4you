@@ -484,70 +484,26 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
-    // Validate Ontario pickup for city-to-city service
-    if (name === 'pickup' && formData.serviceType === 'city') {
-      const isValid = validateOntarioPickup(value);
-      setPickupValidation({
-        isValid,
-        message: isValid ? '' : 'Pickup must be within Ontario, Canada'
-      });
-    }
-
-    // Clear suggestions if input is too short
-    if (value.length <= 2) {
-      if (name === 'pickup') {
-        setPickupSuggestions([]);
-        setShowPickupSuggestions(false);
-      } else {
-        setDestinationSuggestions([]);
-        setShowDestinationSuggestions(false);
-      }
+    if (value.length < 3) {
+      if (name === 'pickup') setPickupSuggestions([]);
+      else setDestinationSuggestions([]);
       return;
     }
 
     try {
-      // Mock response when no API key is provided or in test environment
-      if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY || process.env.NODE_ENV === 'test') {
-        const mockSuggestions = [
-          { description: `${value} (Mock Suggestion 1)` },
-          { description: `${value} (Mock Suggestion 2)` }
-        ];
-
-        if (name === 'pickup') {
-          setPickupSuggestions(mockSuggestions);
-          setShowPickupSuggestions(true);
-        } else {
-          setDestinationSuggestions(mockSuggestions);
-          setShowDestinationSuggestions(true);
-        }
-        return;
-      }
-
-      const response = await fetch(`/api/places?input=${value}`);
-
-      if (!response.ok) throw new Error('API request failed');
-
-      const data = await response.json();
-      const suggestions = data.predictions || [];
+      const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(value)}`);
+      const predictions = await res.json();
+      console.log("Prediction: ", predictions);
 
       if (name === 'pickup') {
-        setPickupSuggestions(suggestions);
+        setPickupSuggestions(predictions);
         setShowPickupSuggestions(true);
       } else {
-        setDestinationSuggestions(suggestions);
+        setDestinationSuggestions(predictions);
         setShowDestinationSuggestions(true);
       }
-
-    } catch (error) {
-      console.error('Location suggestion error:', error);
-      // Fail silently - don't show suggestions but don't break the UI
-      if (name === 'pickup') {
-        setPickupSuggestions([]);
-        setShowPickupSuggestions(false);
-      } else {
-        setDestinationSuggestions([]);
-        setShowDestinationSuggestions(false);
-      }
+    } catch (err) {
+      console.error('Failed to fetch suggestions:', err);
     }
   };
 
