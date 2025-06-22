@@ -487,13 +487,21 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
     try {
       const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(value)}`);
       const predictions = await res.json();
-      console.log("Prediction: ", predictions);
+
+      let filteredPredictions = predictions;
 
       if (name === 'pickup') {
-        setPickupSuggestions(predictions);
+        // Only allow Ontario (ON) in pickup location
+        filteredPredictions = predictions.filter(prediction =>
+          prediction.terms.some(term =>
+            term.value.toLowerCase() === 'ontario' || term.value.toLowerCase() === 'on'
+          )
+        );
+        setPickupSuggestions(filteredPredictions);
         setShowPickupSuggestions(true);
       } else {
-        setDestinationSuggestions(predictions);
+        // Allow all for destination
+        setDestinationSuggestions(filteredPredictions);
         setShowDestinationSuggestions(true);
       }
     } catch (err) {
@@ -1337,7 +1345,7 @@ const BookingForm = () => {
         <div className="p-6 sm:p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Luxury SUV Reservation</h1>
-            <p className="text-gray-600">Complete the form below to book your SUV</p>
+            <p className="text-gray-600">Pick-up from Ontario, Drop-off anywhere in Canada and USA</p>
           </div>
 
           {showSuccess ? (
