@@ -28,7 +28,6 @@ export default async function handler(req, res) {
       originalPrice,
       discount,
       specialRequests,
-      status,
       createdAt
     } = req.body;
 
@@ -136,7 +135,6 @@ export default async function handler(req, res) {
               <div>
                 ${passengers ? `<p><strong>Passengers:</strong> ${passengers}</p>` : ''}
                 ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ''}
-                <p><strong>Status:</strong> <span style="color: #ff9800; font-weight: 500;">Pending Confirmation</span></p>
               </div>
             </div>
             
@@ -148,7 +146,7 @@ export default async function handler(req, res) {
             
             <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 15px;">
               <p><strong>Base Price:</strong> ${formatCurrency(vehicleOriginalPrice || originalPrice)}</p>
-              ${discount ? `<p><strong>Discount Applied:</strong> <span class="discount">${discount}%</span></p>` : ''}
+              ${discount ? `<p><strong>Discount Applied:</strong> <span class="discount">${discount} CAD</span></p>` : ''}
               <p class="price">Estimated Total: ${formatCurrency(price)}</p>
               <p style="font-size: 13px; color: #666;">* Final price may vary based on actual trip details</p>
             </div>
@@ -256,7 +254,7 @@ export default async function handler(req, res) {
             <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 15px;">
               <div class="section-title">Pricing Information</div>
               <p><strong>Vehicle Base Price:</strong> ${formatCurrency(vehicleOriginalPrice || originalPrice)}</p>
-              ${discount ? `<p><strong>Discount Applied:</strong> ${discount}% (${formatCurrency((vehicleOriginalPrice || originalPrice) - (vehiclePrice || price))})</p>` : ''}
+              ${discount ? `<p><strong>Discount Applied:</strong> ${formatCurrency((vehicleOriginalPrice || originalPrice) - (vehiclePrice || price))}</p>` : ''}
               <p><strong>Adjusted Vehicle Price:</strong> ${formatCurrency(vehiclePrice || price)}</p>
               <p><strong>Estimated Total:</strong> <span class="price">${formatCurrency(price)}</span></p>
             </div>
