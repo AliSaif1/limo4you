@@ -158,8 +158,8 @@ export default async function handler(req, res) {
           
           <div class="contact-info">
             <p><strong>Need immediate assistance?</strong></p>
-            <p>Email: <a href="mailto:booking@limo4all.ca" style="color: #3498db;">info@limo4all.ca</a></p>
-            <p>Phone: <a href="tel:+16473131786" style="color: #3498db;">1-888-555-1234</a></p>
+            <p>Email: <a href="mailto:booking@limo4all.ca" style="color: #3498db;">booking@limo4all.ca</a></p>
+            <p>Phone: <a href="tel:+16473131786" style="color: #3498db;">+1 (647) 313- 1786</a></p>
             <p>Hours: 24/7 Customer Support</p>
           </div>
           

@@ -193,7 +193,7 @@ export default async function handler(req, res) {
             <p>If you have any questions or need immediate assistance, please contact us at:</p>
             <ul>
               <li>Phone: [Your Business Phone]</li>
-              <li>Email: <a href="mailto:info@limo4all.ca">info@limo4all.ca</a></li>
+              <li>Email: <a href="mailto:booking@limo4all.ca">booking@limo4all.ca</a></li>
             </ul>
           </div>
           
