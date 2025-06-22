@@ -113,27 +113,21 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
   );
 };
 
-// Helper function to calculate distance using Google Maps API
 const calculateDistance = async (origin, destination) => {
   try {
-    // Mock response for testing
-    if (!process.env.REACT_APP_GOOGLE_MAPS_API_KEY || process.env.NODE_ENV === 'test') {
-      return { distance: 100, duration: '45 mins' }; // Default mock distance of 50km
+    const res = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to get distance');
     }
 
-    const directionsService = new window.google.maps.DirectionsService();
-    const response = await directionsService.route({
-      origin: origin,
-      destination: destination,
-      travelMode: window.google.maps.TravelMode.DRIVING,
-    });
-
-    const distance = response.routes[0].legs[0].distance.value / 1000; // Convert meters to km
-    const duration = response.routes[0].legs[0].duration.text;
-
-    return { distance, duration };
-  } catch (error) {
-    console.error('Error calculating distance:', error);
+    return {
+      distance: data.distance,
+      duration: data.duration,
+    };
+  } catch (err) {
+    console.error('Error fetching backend distance:', err);
     return { distance: 0, duration: '' };
   }
 };
