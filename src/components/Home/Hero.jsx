@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, MessageCircle, Sparkle } from 'lucide-react';
 
 const Hero = () => {
-  const whatsappNumber = '15551234567';
+  const whatsappNumber = '+16473131786';
   const whatsappMessage = 'Hello%20Limo%204%20All,%20I%20would%20like%20to%20inquire%20about%20your%20services';
 
   const containerVariants = {

@@ -1,17 +1,7 @@
-import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
-import CorporateReservationModal from '../CorporateReservationModal';
 
 const CorporateEvents = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedVehicle, setSelectedVehicle] = useState(null);
-
-    const openModal = (vehicle) => {
-        setSelectedVehicle(vehicle);
-        setIsModalOpen(true);
-    };
-
     return (
         <>
             <Helmet>
@@ -48,12 +38,8 @@ const CorporateEvents = () => {
 
             {/* Sticky Booking Button - Hidden on mobile, visible on lg screens */}
             <div className="fixed bottom-6 left-6 z-50 hidden lg:block">
-                <button
-                    onClick={() => openModal({
-                        name: "Corporate Transportation",
-                        maxPassengers: 6,
-                        description: "Premium corporate travel service"
-                    })}
+                <Link
+                    to={'/contact#contact-form'}
                     className="bg-primary hover:bg-primary-700 text-white font-medium py-3 px-6 rounded-full shadow-xl transition-all duration-300 flex items-center animate-bounce"
                     aria-label="Book Corporate Transportation"
                 >
@@ -61,7 +47,7 @@ const CorporateEvents = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                     Book Now
-                </button>
+                </Link>
             </div>
 
             {/* Hero Section */}
@@ -82,16 +68,12 @@ const CorporateEvents = () => {
                             Professional chauffeurs, premium vehicles, and discreet service for your corporate needs in Toronto
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <button
-                                onClick={() => openModal({
-                                    name: "Corporate Transportation",
-                                    maxPassengers: 6,
-                                    description: "Premium corporate travel service"
-                                })}
+                            <Link
+                                to={'/contact#contact-form'}
                                 className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 shadow-lg"
                             >
                                 Book Your Ride
-                            </button>
+                            </Link>
                             <Link
                                 to="/fleet"
                                 className="border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
@@ -227,12 +209,12 @@ const CorporateEvents = () => {
                                                 </li>
                                             ))}
                                         </ul>
-                                        <button
-                                            onClick={() => openModal(vehicle)}
+                                        <Link
+                                            to={'/contact#contact-form'}
                                             className="inline-block w-full text-center bg-primary hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-full transition-colors duration-300"
                                         >
                                             Book This Vehicle
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))}
@@ -287,18 +269,14 @@ const CorporateEvents = () => {
                                 Contact us today to discuss your corporate transportation needs and receive a customized quote.
                             </p>
                             <div className="flex flex-col sm:flex-row justify-center gap-4">
-                                <button
-                                    onClick={() => openModal({
-                                        name: "Corporate Transportation",
-                                        maxPassengers: 6,
-                                        description: "Premium corporate travel service"
-                                    })}
+                                <Link
+                                    to={'/contact#contact-form'}
                                     className="bg-primary hover:bg-primary-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                                 >
                                     Book Now
-                                </button>
+                                </Link>
                                 <Link
-                                    to="tel:+16471234567"
+                                    to="tel:+16473131786"
                                     className="border-2 border-white hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                                 >
                                     Call Now
@@ -308,13 +286,6 @@ const CorporateEvents = () => {
                     </div>
                 </div>
             </section>
-
-            {/* Reservation Modal */}
-            <CorporateReservationModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                selectedLimo={selectedVehicle}
-            />
         </>
     );
 };

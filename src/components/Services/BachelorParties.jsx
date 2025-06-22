@@ -1,17 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import CorporateReservationModal from '../CorporateReservationModal';
 
 const BachelorParties = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedVehicle, setSelectedVehicle] = useState(null);
-
-    const openModal = (vehicle) => {
-        setSelectedVehicle(vehicle);
-        setIsModalOpen(true);
-    };
-
     return (
         <>
             <Helmet>
@@ -238,12 +228,12 @@ const BachelorParties = () => {
                                         </li>
                                     ))}
                                 </ul>
-                                <button
-                                    onClick={() => openModal(vehicle)}
+                                <Link
+                                    to={'/contact#contact-form'}
                                     className="inline-block w-full text-center bg-primary hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-full transition-colors duration-300"
                                 >
                                     Book This Vehicle
-                                </button>
+                                </Link>
                             </div>
                         </div>
                     ))}
@@ -323,22 +313,15 @@ const BachelorParties = () => {
                         >
                             Book Now
                         </Link>
-                        <a
-                            href="tel:+16471234567"
+                        <Link
+                            to="tel:+16473131786"
                             className="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-4 px-8 rounded-full transition-all duration-300"
                         >
                             Call Now
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>
-
-            {/* Reservation Modal */}
-            <CorporateReservationModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                selectedLimo={selectedVehicle}
-            />
         </>
     );
 };

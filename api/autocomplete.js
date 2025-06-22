@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Input too short or missing' });
   }
 
-  const API_KEY = process.env.GOOGLE_API_KEY || 'AIzaSyA4J3_VlIiUvP6Pwh0IhNrSgrd-1IjkzpY';
+  const API_KEY = process.env.GOOGLE_API_KEY;
 
   try {
     const response = await fetch(

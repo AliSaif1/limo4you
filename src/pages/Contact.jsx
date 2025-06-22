@@ -30,7 +30,7 @@ const ContactInfoCard = () => (
         <div>
           <h3 className="text-lg font-medium text-gray-900 mb-1">Phone</h3>
           <p className="text-gray-600" itemProp="telephone">
-            <a href="tel:+15551234567">(555) 123-4567</a>
+            <a href="tel:+16473131786">+1 (647) 313-1786</a>
           </p>
           <p className="text-sm text-gray-500 mt-1">24/7 availability</p>
           <meta itemProp="contactType" content="customer service" />
@@ -103,7 +103,7 @@ const BusinessHoursCard = () => (
       </p>
       <p className="text-primary font-medium flex items-center">
         <Phone className="w-5 h-5 mr-2" />
-        <a href="tel:+15559876543">(555) 987-6543</a>
+        <a href="tel:+16473131786">+1 (647) 313-1786</a>
       </p>
     </div>
   </div>
@@ -264,7 +264,7 @@ const ContactForm = () => {
             value={formData.phone}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
-            placeholder="(555) 123-4567"
+            placeholder="+1 (647) 313-1786"
             itemProp="telephone"
           />
         </div>

@@ -214,7 +214,7 @@ const Weddings = () => {
                                     Book Now
                                 </Link>
                                 <Link
-                                    to="tel:+16471234567"
+                                    to="tel:+16473131786"
                                     className="border-2 border-white hover:bg-white hover:text-gray-900 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300"
                                 >
                                     Call Now

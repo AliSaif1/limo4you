@@ -280,12 +280,12 @@ const GraduationsProms = () => {
                         >
                             Book Now
                         </Link>
-                        <a
-                            href="tel:+16471234567"
+                        <Link
+                            to="tel:+16473131786"
                             className="border-2 border-white text-white hover:bg-white hover:text-gray-900 font-bold py-4 px-8 rounded-full transition-all duration-300"
                         >
                             Call Now
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </section>

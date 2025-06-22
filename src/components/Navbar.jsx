@@ -57,7 +57,7 @@ const Navbar = () => {
               className="flex items-center bg-secondary hover:bg-secondary/90 text-primary font-semibold px-4 py-2 rounded-full transition-all duration-300 whitespace-nowrap shadow-md hover:shadow-lg"
             >
               <Phone className="mr-2" size={18} />
-              <span>+1 (234) 567-890</span>
+              <span>+1 (647) 313-1786</span>
             </a>
           </div>
 
@@ -84,7 +84,7 @@ const Navbar = () => {
               </a>
             ))}
             <a
-              href="tel:+1234567890"
+              href="tel:+16473131786"
               className="flex items-center justify-center bg-secondary text-primary font-medium px-4 py-2 rounded-full mt-3 w-full"
             >
               <Phone className="mr-2" size={18} />

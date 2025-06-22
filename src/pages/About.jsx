@@ -1,4 +1,5 @@
 import { Car, ShieldCheck, Star, Users, Clock, MapPin, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 function About() {
   return (
@@ -205,9 +206,10 @@ function About() {
           </div>
 
           <div className="text-center">
-            <button className="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+            <Link className="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
+            to={'/fleet'}>
               Explore Full Fleet
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -283,14 +285,11 @@ function About() {
             Book your luxury transportation today and travel with the confidence of professional service.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center">
-              Book Now
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </button>
-            <button className="bg-white hover:bg-gray-50 text-primary font-medium py-3 px-8 rounded-lg border border-gray-300 transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center">
+            <Link className="bg-primary hover:bg-primary-dark text-white font-medium py-3 px-8 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex items-center justify-center"
+            to={'/contact#contact-form'}>
               Contact Us
               <ChevronRight className="w-5 h-5 ml-2" />
-            </button>
+            </Link>
           </div>
         </div>
       </div>
