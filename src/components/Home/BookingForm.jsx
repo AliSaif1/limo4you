@@ -843,12 +843,16 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
           </p>
         </div>
 
-        {selectedVehicle?.price > 0 && (
+        {(formData.isAirportPickup ? selectedAirport?.price : selectedVehicle?.price) > 0 && (
           <div className="border-t border-gray-200 pt-4 mb-6">
             <div className="flex justify-between items-center">
               <span className="font-bold text-gray-800">Estimated Price:</span>
               <div className="flex items-center gap-2">
-                <span className="text-sm line-through text-gray-500">${selectedVehicle.originalPrice * duration}</span>
+                <span className="text-sm line-through text-gray-500">
+                  ${formData.isAirportPickup
+                    ? selectedAirport?.originalPrice
+                    : selectedVehicle?.originalPrice * duration}
+                </span>
                 <span className="font-bold text-primary text-lg">
                   ${totalPrice}
                 </span>
@@ -959,12 +963,16 @@ const BookingSummary = ({ formData }) => {
         </p>
       </div>
 
-      {selectedVehicle?.price > 0 && (
+      {(formData.isAirportPickup ? selectedAirport?.price : selectedVehicle?.price) > 0 && (
         <div className="border-t border-gray-200 pt-4 mb-6">
           <div className="flex justify-between items-center">
             <span className="font-bold text-gray-800">Estimated Price:</span>
             <div className="flex items-center gap-2">
-              <span className="text-sm line-through text-gray-500">${selectedVehicle.originalPrice * duration}</span>
+              <span className="text-sm line-through text-gray-500">
+                ${formData.isAirportPickup
+                  ? selectedAirport?.originalPrice
+                  : selectedVehicle?.originalPrice * duration}
+              </span>
               <span className="font-bold text-primary text-lg">
                 ${totalPrice}
               </span>
