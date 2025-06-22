@@ -44,12 +44,14 @@ export default async function handler(req, res) {
       },
     });
 
-    // Format currency
     const formatCurrency = (amount) => {
-      return new Intl.NumberFormat('en-US', {
+      const roundedUpAmount = Math.ceil(amount); // Round up to nearest whole number
+      return new Intl.NumberFormat('en-CA', {
         style: 'currency',
-        currency: 'USD',
-      }).format(amount);
+        currency: 'CAD',
+        maximumFractionDigits: 0, // No decimals
+        minimumFractionDigits: 0
+      }).format(roundedUpAmount);
     };
 
     // Format date and time
