@@ -134,7 +134,7 @@ export default async function handler(req, res) {
               </div>
               <div>
                 ${passengers ? `<p><strong>Passengers:</strong> ${passengers}</p>` : ''}
-                ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ''}
+                ${duration ? `<p><strong>Duration:</strong> ${duration} hours</p>` : ''}
               </div>
             </div>
             
@@ -168,7 +168,6 @@ export default async function handler(req, res) {
           <div class="footer">
             <p>This is an automated message. Please do not reply directly to this email.</p>
             <p>© ${new Date().getFullYear()} Limo4All. All rights reserved.</p>
-            <p>1234 Limo Lane, Suite 100, Toronto, ON M1M 1M1</p>
           </div>
         </body>
         </html>
@@ -240,7 +239,7 @@ export default async function handler(req, res) {
               </div>
               <div>
                 ${passengers ? `<p><strong>Passengers:</strong> ${passengers}</p>` : ''}
-                ${duration ? `<p><strong>Duration:</strong> ${duration}</p>` : ''}
+                ${duration ? `<p><strong>Duration:</strong> ${duration} hours</p>` : ''}
                 ${isAirportPickup ? `<p><strong>Airport Pickup:</strong> Yes</p>` : ''}
               </div>
             </div>
