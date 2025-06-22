@@ -1,4 +1,4 @@
-// Vercel Serverless Function: /api/autocomplete.js
+// /api/autocomplete.js (Vercel serverless function)
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
@@ -11,13 +11,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Input too short or missing' });
   }
 
-  const API_KEY = process.env.GOOGLE_API_KEY; // make sure it's set in Vercel project settings
+  const API_KEY = process.env.GOOGLE_API_KEY || 'AIzaSyA4J3_VlIiUvP6Pwh0IhNrSgrd-1IjkzpY';
 
   try {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
-        input
-      )}&key=${API_KEY}&components=country:ca&types=geocode`
+      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${API_KEY}&components=country:ca&types=geocode`
     );
 
     const data = await response.json();
