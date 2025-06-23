@@ -1,5 +1,3 @@
-// /api/autocomplete.js (Vercel serverless function)
-
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -15,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${API_KEY}&components=country:ca&types=geocode`
+      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${API_KEY}&location=43.6532,-79.3832&radius=50000`
     );
 
     const data = await response.json();

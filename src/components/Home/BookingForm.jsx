@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { Calendar, Clock, MapPin, User, ChevronLeft, Car, Smartphone, Mail, X, Plane } from 'lucide-react';
@@ -445,6 +445,7 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
 };
 
 const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) => {
+  const debounceRef = useRef();
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
   const [showPickupSuggestions, setShowPickupSuggestions] = useState(false);
@@ -474,7 +475,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
     }
   };
 
-  const handleLocationInput = async (e) => {
+  const handleLocationInput = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
@@ -484,6 +485,16 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       return;
     }
 
+    // Clear previous debounce
+    clearTimeout(debounceRef.current);
+
+    // Debounce API call
+    debounceRef.current = setTimeout(() => {
+      fetchSuggestions(value, name);
+    }, 500); // 500ms delay
+  };
+
+  const fetchSuggestions = async (value, name) => {
     try {
       const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(value)}`);
       const predictions = await res.json();
@@ -491,7 +502,6 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       let filteredPredictions = predictions;
 
       if (name === 'pickup') {
-        // Only allow Ontario (ON) in pickup location
         filteredPredictions = predictions.filter(prediction =>
           prediction.terms.some(term =>
             term.value.toLowerCase() === 'ontario' || term.value.toLowerCase() === 'on'
@@ -500,7 +510,12 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         setPickupSuggestions(filteredPredictions);
         setShowPickupSuggestions(true);
       } else {
-        // Allow all for destination
+        const countryAllowed = ['canada', 'united states', 'usa'];
+        filteredPredictions = predictions.filter(prediction =>
+          prediction.terms.some(term =>
+            countryAllowed.includes(term.value.toLowerCase())
+          )
+        );
         setDestinationSuggestions(filteredPredictions);
         setShowDestinationSuggestions(true);
       }
