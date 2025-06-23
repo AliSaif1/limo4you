@@ -445,7 +445,7 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
   );
 };
 
-const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) => {
+const LocationPassengers = ({ formData, setFormData, errors, setErrors, onNext, onBack }) => {
   const debounceRef = useRef();
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
@@ -472,19 +472,29 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       );
 
       const distanceInKm = distance.value / 1000;
+      setDistanceInfo({ distance: distanceInKm, duration });
+      setFormData(prev => ({ ...prev, distance: distanceInKm }));
 
-      // Block city-to-city if distance is below threshold
+      // ✅ Set error immediately if distance too short
       if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
-        alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.');
+        setErrors(prev => ({
+          ...prev,
+          distance: `Minimum distance for city-to-city booking is ${MIN_CITY_DISTANCE_KM} km`
+        }));
+      } else {
+        // ✅ Clear error if distance is valid
+        setErrors(prev => {
+          const { distance, ...rest } = prev;
+          return rest;
+        });
       }
-
-      // Proceed normally
-      setDistanceInfo({ distance, duration });
-      setFormData(prev => ({ ...prev, distance }));
-
     } catch (error) {
       console.error('Failed to calculate distance:', error);
       setDistanceInfo(null);
+      setErrors(prev => ({
+        ...prev,
+        distance: 'Failed to calculate distance. Please try again.'
+      }));
     } finally {
       setDistanceLoading(false);
     }
@@ -1429,6 +1439,7 @@ const BookingForm = () => {
                     formData={formData}
                     setFormData={setFormData}
                     errors={errors}
+                    setErrors={setErrors}
                     onNext={handleNext}
                     onBack={handleBack}
                   />
