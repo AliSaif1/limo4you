@@ -3,35 +3,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { origin, destination } = req.query;
+  const { originLat, originLon, destinationLat, destinationLon } = req.query;
 
-  if (!origin || !destination) {
-    return res.status(400).json({ error: 'Origin and destination are required' });
+  if (!originLat || !originLon || !destinationLat || !destinationLon) {
+    return res.status(400).json({ error: 'Coordinates are required' });
   }
 
   const API_KEY = process.env.ORS_API_KEY;
 
   try {
-    // First, geocode origin and destination to get coordinates
-    const geocode = async (query) => {
-      const geoRes = await fetch(
-        `https://api.openrouteservice.org/geocode/search?api_key=${API_KEY}&text=${encodeURIComponent(query)}&boundary.country=CA&size=1`
-      );
-      const geoData = await geoRes.json();
-
-      if (!geoData.features || geoData.features.length === 0) {
-        throw new Error(`No results found for: ${query}`);
-      }
-
-      return geoData.features[0].geometry.coordinates; // [lon, lat]
-    };
-
-    const [originCoord, destinationCoord] = await Promise.all([
-      geocode(origin),
-      geocode(destination)
-    ]);
-
-    // Now call Matrix API
     const matrixRes = await fetch('https://api.openrouteservice.org/v2/matrix/driving-car', {
       method: 'POST',
       headers: {
@@ -39,7 +19,10 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        locations: [originCoord, destinationCoord],
+        locations: [
+          [parseFloat(originLon), parseFloat(originLat)],
+          [parseFloat(destinationLon), parseFloat(destinationLat)]
+        ],
         metrics: ['distance', 'duration'],
         units: 'km'
       })

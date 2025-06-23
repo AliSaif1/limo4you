@@ -495,6 +495,8 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   const [availableDestinations, setAvailableDestinations] = useState([]);
   const [pickupSelected, setPickupSelected] = useState(false);
   const [destinationSelected, setDestinationSelected] = useState(false);
+  const [pickupCoords, setPickupCoords] = useState(null);
+  const [destinationCoords, setDestinationCoords] = useState(null);
 
 
   // Calculate distance when service type is city-to-city or within city and both locations are entered
@@ -525,25 +527,25 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   }, [formData.pickup, formData.serviceType]);
 
   const calculateDistanceAndUpdate = async () => {
+    if (!pickupCoords || !destinationCoords) return;
+
     setDistanceLoading(true);
 
     try {
-      const { distance, duration } = await calculateDistance(
-        formData.pickup,
-        formData.destination
-      );
+      const res = await fetch(`/api/distance?originLat=${pickupCoords.lat}&originLon=${pickupCoords.lon}&destinationLat=${destinationCoords.lat}&destinationLon=${destinationCoords.lon}`);
+      const data = await res.json();
 
-      const distanceInKm = distance.value / 1000;
+      if (!data || data.error) throw new Error(data.error || 'Unknown error');
+
+      const { distance, duration } = data;
 
       // Block city-to-city if distance is below threshold
-      if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
+      if (formData.serviceType === 'city' && distance < MIN_CITY_DISTANCE_KM) {
         alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination or select "Within City" service.');
       }
 
-      // Proceed normally
       setDistanceInfo({ distance, duration });
       setFormData(prev => ({ ...prev, distance }));
-
     } catch (error) {
       console.error('Failed to calculate distance:', error);
       setDistanceInfo(null);
@@ -622,8 +624,10 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
     setFormData(prev => ({ ...prev, [field]: suggestion.description }));
 
     if (field === 'pickup') {
+      setPickupCoords({ lat: suggestion.lat, lon: suggestion.lon });
       setPickupSelected(true);
       setShowPickupSuggestions(false);
+
       if (formData.serviceType === 'city' || formData.serviceType === 'withinCity') {
         const isValid = validateOntarioPickup(suggestion.description);
         setPickupValidation({
@@ -632,6 +636,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         });
       }
     } else {
+      setDestinationCoords({ lat: suggestion.lat, lon: suggestion.lon });
       setDestinationSelected(true);
       setShowDestinationSuggestions(false);
     }
