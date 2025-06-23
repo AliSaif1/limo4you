@@ -886,13 +886,9 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
     originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
     pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
   } else if (formData.serviceType === 'city') {
-    const distance = formData.distance || 0;
-    const rate = distance > 50 ? 2.5 : 6;
-    const originalRate = distance > 50 ? 2.5 : 7;
-
-    totalPrice = distance * rate;
-    originalPrice = distance * originalRate;
-    pricingDescription = `${distance.toFixed(1)} km × $${rate}/km`;
+    totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
+    originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
+    pricingDescription = `${(formData.distance || 0).toFixed(1)} km × $${selectedVehicle?.perKmPrice}/km`;
   }
 
   return (
@@ -1091,12 +1087,8 @@ const BookingSummary = ({ formData }) => {
     totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
     originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
   } else if (formData.serviceType === 'city') {
-    const distance = formData.distance || 0;
-    const rate = distance > 50 ? 2.5 : 6;
-    const originalRate = distance > 50 ? 2.5 : 7;
-
-    totalPrice = distance * rate;
-    originalPrice = distance * originalRate;
+    totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
+    originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
   }
 
   return (
@@ -1278,13 +1270,9 @@ const BookingForm = () => {
         originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
         pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
       } else if (formData.serviceType === 'city') {
-        const distance = formData.distance || 0;
-        const rate = distance > 50 ? 2.5 : 6;
-        const originalRate = distance > 50 ? 2.5 : 7;
-
-        totalPrice = distance * rate;
-        originalPrice = distance * originalRate;
-        pricingDescription = `${distance.toFixed(1)} km × $${rate}/km`;
+        totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
+        originalPrice = totalPrice * 1.2; // Assuming 20% discount for original price display
+        pricingDescription = `${(formData.distance || 0).toFixed(1)} km × $${selectedVehicle?.perKmPrice}/km`;
       }
 
       // Prepare data for API and Firebase
