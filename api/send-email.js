@@ -31,6 +31,7 @@ export default async function handler(req, res) {
       createdAt
     } = req.body;
 
+    const roundedDiscount = discount ? Math.ceil(Number(discount)) : 0;
     // Validation
     if (!name || !email || !pickup || !destination || !date || !pickupTime) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
@@ -148,7 +149,7 @@ export default async function handler(req, res) {
             
             <div style="margin-top: 20px; border-top: 1px dashed #ddd; padding-top: 15px;">
               <p><strong>Base Price:</strong> ${formatCurrency(vehicleOriginalPrice || originalPrice)}</p>
-              ${discount ? `<p><strong>Discount Applied:</strong> <span class="discount">${discount} CAD</span></p>` : ''}
+              ${discount ? `<p><strong>Discount Applied:</strong> <span class="discount">${roundedDiscount} CAD</span></p>` : ''}
               <p class="price">Estimated Total: ${formatCurrency(price)}</p>
               <p style="font-size: 13px; color: #666;">* Final price may vary based on actual trip details</p>
             </div>
