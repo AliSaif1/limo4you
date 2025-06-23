@@ -678,8 +678,11 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
             <h3 className="text-lg font-semibold text-gray-700 mb-3">Distance</h3>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+
               {distanceLoading ? (
                 <div className="w-full pl-10 pr-4 py-2 text-gray-500">Calculating distance...</div>
+              ) : errors.distance ? (
+                <div className="w-full pl-10 pr-4 py-2 text-red-500 text-sm">{errors.distance}</div>
               ) : distanceInfo ? (
                 <div className="w-full pl-10 pr-4 py-2 text-gray-800">
                   {distanceInfo.distance.toFixed(1)} km ({distanceInfo.duration})
@@ -732,12 +735,12 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
             ))
           }
           className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.pickup ||
-              (formData.serviceType !== 'airport' && !formData.destination) ||
-              (formData.serviceType === 'city' && (
-                !pickupValidation.isValid ||
-                distanceInKm === null ||
-                distanceInKm < MIN_CITY_DISTANCE_KM
-              )) ? 'opacity-50 cursor-not-allowed' : ''
+            (formData.serviceType !== 'airport' && !formData.destination) ||
+            (formData.serviceType === 'city' && (
+              !pickupValidation.isValid ||
+              distanceInKm === null ||
+              distanceInKm < MIN_CITY_DISTANCE_KM
+            )) ? 'opacity-50 cursor-not-allowed' : ''
             }`}
         >
           Next
@@ -1356,10 +1359,20 @@ const BookingForm = () => {
       if (!formData.pickupTime) stepErrors.pickupTime = 'Please select pickup time';
       if (formData.serviceType === 'event' && !formData.dropoffTime) stepErrors.dropoffTime = 'Please select dropoff time';
       if (formData.serviceType === 'airport' && !formData.flightNumber) stepErrors.flightNumber = 'Please enter flight number';
-    } else if (step === 2) {
+    } if (step === 2) {
       if (!formData.pickup) stepErrors.pickup = 'Pickup location is required';
-      if (formData.serviceType !== 'airport' && !formData.destination) stepErrors.destination = 'Destination is required';
-    } else if (step === 3) {
+      if (formData.serviceType !== 'airport' && !formData.destination)
+        stepErrors.destination = 'Destination is required';
+
+      // ✅ Enforce distance constraint here as well
+      if (
+        formData.serviceType === 'city' &&
+        (!formData.distance || formData.distance < MIN_CITY_DISTANCE_KM)
+      ) {
+        stepErrors.distance = `Minimum distance for city-to-city booking is ${MIN_CITY_DISTANCE_KM} km`;
+      }
+    }
+    else if (step === 3) {
       if (!formData.name) stepErrors.name = 'Name is required';
       if (!formData.email) stepErrors.email = 'Email is required';
       if (!formData.phone) stepErrors.phone = 'Phone number is required';
