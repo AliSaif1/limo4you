@@ -6,14 +6,15 @@ import { ExclamationCircleIcon } from '@heroicons/react/24/solid';
 
 // Constants
 const VEHICLE_TYPES = [
-  { id: 'suv', name: 'SUV', capacity: 6, icon: '🚙', hourlyPrice: 100, originalHourlyPrice: 120, originalKmPrice: 3, perKmPrice: 2.5, cityKmPrice: 6 },
+  { id: 'suv', name: 'SUV', capacity: 6, icon: '🚙', hourlyPrice: 100, originalHourlyPrice: 120, originalKmPrice: 3, perKmPrice: 2.6, cityKmPrice: 4 },
 ];
 
 const SERVICE_TYPES = [
   { id: 'event', name: 'Event Service', pricingType: 'hourly' },
   { id: 'airport', name: 'Airport Pickup', pricingType: 'flat' },
   { id: 'city', name: 'City to City', pricingType: 'distance' },
-  { id: 'withinCity', name: 'Within City', pricingType: 'cityDistance' },
+  { id: 'withinCity', name: 'City/Airport Drop Offs', pricingType: 'cityDistance' },
+
 ];
 
 const AIRPORT_OPTIONS = [
@@ -23,9 +24,10 @@ const AIRPORT_OPTIONS = [
     price: 120,
     originalPrice: 140,
     destinations: [
-      { id: 'downtown', name: 'Downtown Toronto', price: 120, originalPrice: 140, },
-      { id: 'mississauga', name: 'Mississauga', price: 100, originalPrice: 120, },
-      { id: 'brampton', name: 'Brampton', price: 110, originalPrice: 130, },
+      { id: 'downtown', name: 'Downtown Toronto', price: 105, originalPrice: 120, },
+      { id: 'mississauga', name: 'Mississauga', price: 85, originalPrice: 100, },
+      { id: 'brampton', name: 'Brampton', price: 85, originalPrice: 100, },
+      { id: 'niagra', name: 'Niagara Falls', price: 275, originalPrice: 290, },
     ]
   },
   {
@@ -34,9 +36,7 @@ const AIRPORT_OPTIONS = [
     price: 100,
     originalPrice: 120,
     destinations: [
-      { id: 'downtown', name: 'Downtown Toronto', price: 100, originalPrice: 120, },
-      { id: 'liberty', name: 'Liberty Village', price: 90, originalPrice: 110, },
-      { id: 'yorkville', name: 'Yorkville', price: 95, originalPrice: 115, },
+      { id: 'downtown', name: 'Downtown Toronto', price: 75, originalPrice: 95, },
     ]
   },
   {
@@ -45,11 +45,34 @@ const AIRPORT_OPTIONS = [
     price: 150,
     originalPrice: 170,
     destinations: [
-      { id: 'hamilton', name: 'Hamilton Downtown', price: 150, originalPrice: 170, },
-      { id: 'burlington', name: 'Burlington', price: 130, originalPrice: 150, },
-      { id: 'niagara', name: 'Niagara Falls', price: 170, originalPrice: 170, },
+      { id: 'toronto', name: 'Toronto Downtown', price: 150, originalPrice: 170, },
     ]
   },
+];
+
+const FIXED_WITHIN_AND_CITY_CITY = [
+  { id: 'tormis', city1: 'Downtown Toronto', city2: "Mississauga", price: 85, originalPrice: 100 },
+  { id: 'torbra', city1: 'Downtown Toronto', city2: "Brampton", price: 85, originalPrice: 100 },
+  { id: 'torham', city1: 'Downtown Toronto', city2: "Hamilton", price: 150, originalPrice: 170 },
+  { id: 'toryork', city1: 'Downtown Toronto', city2: "Yorkville", price: 95, originalPrice: 115 },
+  { id: 'tormil', city1: 'Downtown Toronto', city2: "Milton", price: 105, originalPrice: 120 },
+  { id: 'torbur', city1: 'Downtown Toronto', city2: "Burlington", price: 125, originalPrice: 140 },
+  { id: 'torsca', city1: 'Downtown Toronto', city2: "Scarborough", price: 80, originalPrice: 95 },
+  { id: 'torpik', city1: 'Downtown Toronto', city2: "Pickering", price: 90, originalPrice: 100 },
+  { id: 'torage', city1: 'Downtown Toronto', city2: "Ajax", price: 100, originalPrice: 115 },
+  { id: 'torwit', city1: 'Downtown Toronto', city2: "Whitby", price: 125, originalPrice: 140 },
+  { id: 'torash', city1: 'Downtown Toronto', city2: "Oshawa", price: 140, originalPrice: 160 },
+  { id: 'torvau', city1: 'Downtown Toronto', city2: "Vaughan", price: 90, originalPrice: 110 },
+  { id: 'torric', city1: 'Downtown Toronto', city2: "Richmond Hill", price: 110, originalPrice: 125 },
+  { id: 'tormar', city1: 'Downtown Toronto', city2: "Markham", price: 110, originalPrice: 125 },
+  { id: 'torsto', city1: 'Downtown Toronto', city2: "Stouffville", price: 125, originalPrice: 140 },
+  { id: 'tornia', city1: 'Downtown Toronto', city2: "Niagara Falls", price: 290, originalPrice: 310 },
+  { id: 'torpea', city1: 'Downtown Toronto', city2: "Pearson Airport (YYZ)", price: 90, originalPrice: 105 },
+  { id: 'tormiss', city1: 'Mississauga', city2: "Pearson Airport (YYZ)", price: 85, originalPrice: 100 },
+  { id: 'torBram', city1: 'Brampton', city2: "Pearson Airport (YYZ)", price: 85, originalPrice: 100 },
+  { id: 'torniag', city1: 'Niagara Falls', city2: "Pearson Airport (YYZ)", price: 275, originalPrice: 290 },
+  { id: 'torbill', city1: 'Downtown Toronto', city2: "Billy Bishop", price: 75, originalPrice: 90 },
+  { id: 'tormun', city1: 'Downtown Toronto', city2: "John C. Munro", price: 150, originalPrice: 160 },
 ];
 
 // List of Ontario cities for validation
@@ -68,8 +91,7 @@ const ONTARIO_CITIES = [
 
 const MINIMUM_DURATION = 3; // 3 hours minimum
 const MINIMUM_PREPARATION_HOURS = 4; // 4 hours minimum between booking and pickup (configurable)
-const MIN_CITY_DISTANCE_KM = 50;
-const MAX_WITHIN_CITY_DISTANCE_KM = 50;
+const MIN_CITY_DISTANCE_KM = 130;
 
 const getOntarioDateTime = () => {
   const now = new Date();
@@ -144,25 +166,6 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
       </div>
     </div>
   );
-};
-
-const calculateDistance = async (origin, destination) => {
-  try {
-    const res = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || 'Failed to get distance');
-    }
-
-    return {
-      distance: data.distance,
-      duration: data.duration,
-    };
-  } catch (err) {
-    console.error('Error fetching backend distance:', err);
-    return { distance: 0, duration: '' };
-  }
 };
 
 // Helper function to validate if pickup is in Ontario
@@ -541,7 +544,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
       // Block city-to-city if distance is below threshold
       if (formData.serviceType === 'city' && distance < MIN_CITY_DISTANCE_KM) {
-        alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination or select "Within City" service.');
+        alert('City-to-city bookings require a minimum distance of 130 km. Please choose a different destination or select "Within City" service.');
       }
 
       setDistanceInfo({ distance, duration });
@@ -972,6 +975,16 @@ const ContactDetails = ({ formData, setFormData, setErrors, errors, onNext, onBa
   );
 };
 
+// Helper to get fixed rate for city pair (bidirectional)
+const getFixedRateForCities = (pickup, destination) => {
+  if (!pickup || !destination) return null;
+  return FIXED_WITHIN_AND_CITY_CITY.find(
+    pair =>
+      (pair.city1.toLowerCase() === pickup.toLowerCase() && pair.city2.toLowerCase() === destination.toLowerCase()) ||
+      (pair.city2.toLowerCase() === pickup.toLowerCase() && pair.city1.toLowerCase() === destination.toLowerCase())
+  );
+};
+
 const ReservationSummary = ({ formData, onSubmit, onBack }) => {
   const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
   const selectedAirport = formData.serviceType === 'airport'
@@ -986,9 +999,10 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
   let totalPrice = 0;
   let originalPrice = 0;
   let pricingDescription = '';
+  const fixedMatch = getFixedRateForCities(formData.pickup, formData.destination);
 
+  // Service-specific pricing
   if (formData.serviceType === 'airport') {
-    // For airport pickups, use the destination price if available
     const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
     const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
 
@@ -999,6 +1013,11 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
     totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
     originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
     pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
+  } else if (fixedMatch && (formData.serviceType === 'city' || formData.serviceType === 'withinCity')) {
+    // Apply fixed pricing for city and withinCity types
+    totalPrice = fixedMatch.price;
+    originalPrice = fixedMatch.originalPrice;
+    pricingDescription = `Flat rate for ${fixedMatch.city1} ↔ ${fixedMatch.city2}`;
   } else if (formData.serviceType === 'city') {
     totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
     originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
@@ -1197,17 +1216,20 @@ const BookingSummary = ({ formData }) => {
 
   let totalPrice = 0;
   let originalPrice = 0;
+  const fixedMatch = getFixedRateForCities(formData.pickup, formData.destination);
 
+  // Service-specific pricing
   if (formData.serviceType === 'airport') {
-    // For airport pickups, use the destination price if available
     const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
     const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
-
     totalPrice = destinationPrice;
     originalPrice = destinationOriginalPrice;
   } else if (formData.serviceType === 'event') {
     totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
     originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
+  } else if (fixedMatch && (formData.serviceType === 'city' || formData.serviceType === 'withinCity')) {
+    totalPrice = fixedMatch.price;
+    originalPrice = fixedMatch.originalPrice;
   } else if (formData.serviceType === 'city') {
     totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
     originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
