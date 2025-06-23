@@ -476,7 +476,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       setDistanceInKm(distanceInKm); // <-- Track km separately
 
       if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
-        setDistanceInfo(null); // No distance shown
+        setDistanceInfo({ distance: distanceInKm, duration });
         setFormData(prev => ({ ...prev, distance: null }));
         alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.');
         return;
