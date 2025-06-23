@@ -9,22 +9,32 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Input too short or missing' });
   }
 
-  const API_KEY = process.env.GOOGLE_API_KEY;
+  const API_KEY = process.env.LOCATIONIQ_API_KEY;
 
   try {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${API_KEY}&location=43.6532,-79.3832&radius=50000`
+      `https://api.locationiq.com/v1/autocomplete?key=${API_KEY}&q=${encodeURIComponent(input)}&limit=5&dedupe=1&countrycodes=ca,us&normalizecity=1`
     );
 
     const data = await response.json();
 
-    if (data.status !== 'OK') {
-      return res.status(500).json({ error: data.error_message || 'Google API error' });
+    if (!Array.isArray(data)) {
+      return res.status(500).json({ error: 'LocationIQ API error' });
     }
 
-    return res.status(200).json(data.predictions);
+    // Convert LocationIQ results to mimic Google's format
+    const predictions = data.map((item) => ({
+      description: item.display_name,
+      terms: item.display_name
+        .split(',')
+        .map((term) => ({ value: term.trim() })),
+      lat: item.lat,
+      lon: item.lon,
+    }));
+
+    return res.status(200).json(predictions);
   } catch (err) {
-    console.error('Autocomplete API Error:', err);
+    console.error('LocationIQ Autocomplete API Error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
