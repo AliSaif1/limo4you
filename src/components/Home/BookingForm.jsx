@@ -454,7 +454,6 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   const [pickupValidation, setPickupValidation] = useState({ isValid: true, message: '' });
   const [distanceInfo, setDistanceInfo] = useState(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
-  const [distanceInKm, setDistanceInKm] = useState(0);
 
   // Calculate distance when service type is city-to-city and both locations are entered
   useEffect(() => {
@@ -473,19 +472,19 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       );
 
       const distanceInKm = distance.value / 1000;
-      setDistanceInKm(distanceInKm); // Track km separately
-      setDistanceInfo({ distance: distanceInKm, duration }); // Always set
-      setFormData(prev => ({ ...prev, distance: distanceInKm })); // Always update form
 
-      // Optional: Alert for awareness, but do NOT block
+      // Block city-to-city if distance is below threshold
       if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
-        alert(`City-to-city bookings require a minimum distance of ${MIN_CITY_DISTANCE_KM} km.`);
+        alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.');
       }
+
+      // Proceed normally
+      setDistanceInfo({ distance, duration });
+      setFormData(prev => ({ ...prev, distance }));
 
     } catch (error) {
       console.error('Failed to calculate distance:', error);
       setDistanceInfo(null);
-      setDistanceInKm(null);
     } finally {
       setDistanceLoading(false);
     }
@@ -725,19 +724,12 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
           disabled={
             !formData.pickup ||
             (formData.serviceType !== 'airport' && !formData.destination) ||
-            (formData.serviceType === 'city' && (
-              !pickupValidation.isValid ||
-              distanceInKm === null ||
-              distanceInKm < MIN_CITY_DISTANCE_KM
-            ))
+            (formData.serviceType === 'city' && !pickupValidation.isValid)
           }
           className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.pickup ||
             (formData.serviceType !== 'airport' && !formData.destination) ||
-            (formData.serviceType === 'city' && (
-              !pickupValidation.isValid ||
-              distanceInKm === null ||
-              distanceInKm < MIN_CITY_DISTANCE_KM
-            )) ? 'opacity-50 cursor-not-allowed' : ''
+            (formData.serviceType === 'city' && !pickupValidation.isValid)
+            ? 'opacity-50 cursor-not-allowed' : ''
             }`}
         >
           Next
