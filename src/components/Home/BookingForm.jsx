@@ -568,9 +568,9 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
   const fetchSuggestions = async (value, name) => {
     try {
-      // const apiKey = process.env.REACT_APP_LOCATIONIQ_API_KEY || process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
+      const apiKey = process.env.REACT_APP_LOCATIONIQ_API_KEY || process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
 
-      const url = '/api/autocomplete';
+      const url = `https://api.locationiq.com/v1/autocomplete?key=${apiKey}&q=${encodeURIComponent(value)}&limit=10&dedupe=1&countrycodes=ca,us&normalizecity=1`;
 
       const res = await fetch(url);
       const data = await res.json();
