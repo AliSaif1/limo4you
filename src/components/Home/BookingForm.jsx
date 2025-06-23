@@ -454,7 +454,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   const [pickupValidation, setPickupValidation] = useState({ isValid: true, message: '' });
   const [distanceInfo, setDistanceInfo] = useState(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
-  const [distanceInKm, setDistanceInKm] = useState(null);
+  const [distanceInKm, setDistanceInKm] = useState(0);
 
   // Calculate distance when service type is city-to-city and both locations are entered
   useEffect(() => {
@@ -473,17 +473,14 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       );
 
       const distanceInKm = distance.value / 1000;
-      setDistanceInKm(distanceInKm); // <-- Track km separately
+      setDistanceInKm(distanceInKm); // Track km separately
+      setDistanceInfo({ distance: distanceInKm, duration }); // Always set
+      setFormData(prev => ({ ...prev, distance: distanceInKm })); // Always update form
 
+      // Optional: Alert for awareness, but do NOT block
       if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
-        setDistanceInfo({ distance: distanceInKm, duration });
-        setFormData(prev => ({ ...prev, distance: distanceInKm }));
-        alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.');
-        return;
+        alert(`City-to-city bookings require a minimum distance of ${MIN_CITY_DISTANCE_KM} km.`);
       }
-
-      setDistanceInfo({ distance: distanceInKm, duration });
-      setFormData(prev => ({ ...prev, distance: distanceInKm }));
 
     } catch (error) {
       console.error('Failed to calculate distance:', error);
