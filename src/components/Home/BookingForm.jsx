@@ -535,11 +535,6 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination or select "Within City" service.');
       }
 
-      // Block within city if distance is above threshold
-      if (formData.serviceType === 'withinCity' && distanceInKm > MAX_WITHIN_CITY_DISTANCE_KM) {
-        alert('Within city bookings must be under 50 km. Please choose a closer destination or select "City to City" service.');
-      }
-
       // Proceed normally
       setDistanceInfo({ distance, duration });
       setFormData(prev => ({ ...prev, distance }));
@@ -967,7 +962,7 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
     // For airport pickups, use the destination price if available
     const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
     const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
-    
+
     totalPrice = destinationPrice;
     originalPrice = destinationOriginalPrice;
     pricingDescription = 'Flat rate';
@@ -1178,7 +1173,7 @@ const BookingSummary = ({ formData }) => {
     // For airport pickups, use the destination price if available
     const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
     const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
-    
+
     totalPrice = destinationPrice;
     originalPrice = destinationOriginalPrice;
   } else if (formData.serviceType === 'event') {
@@ -1365,7 +1360,7 @@ const BookingForm = () => {
         // For airport pickups, use the destination price if available
         const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
         const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
-        
+
         totalPrice = destinationPrice;
         originalPrice = destinationOriginalPrice;
         pricingDescription = 'Flat rate';
@@ -1464,9 +1459,6 @@ const BookingForm = () => {
       // Enforce distance constraints
       if (formData.serviceType === 'city' && (!formData.distance || formData.distance < MIN_CITY_DISTANCE_KM)) {
         stepErrors.distance = `Minimum distance for city-to-city booking is ${MIN_CITY_DISTANCE_KM} km`;
-      }
-      if (formData.serviceType === 'withinCity' && (!formData.distance || formData.distance > MAX_WITHIN_CITY_DISTANCE_KM)) {
-        stepErrors.distance = `Within city bookings must be under ${MAX_WITHIN_CITY_DISTANCE_KM} km`;
       }
     }
     else if (step === 3) {
