@@ -130,12 +130,6 @@ const FIXED_WITHIN_AND_CITY_CITY = [
   { id: 'tormar', city1: 'Toronto', city2: "Markham", price: 110, originalPrice: 125 },
   { id: 'torsto', city1: 'Toronto', city2: "Stouffville", price: 125, originalPrice: 140 },
   { id: 'tornia', city1: 'Toronto', city2: "Niagara Falls", price: 290, originalPrice: 310 },
-  { id: 'torpea', city1: 'Toronto', city2: "Pearson Airport (YYZ)", price: 90, originalPrice: 105 },
-  { id: 'tormiss', city1: 'Mississauga', city2: "Pearson Airport (YYZ)", price: 85, originalPrice: 100 },
-  { id: 'torBram', city1: 'Brampton', city2: "Pearson Airport (YYZ)", price: 85, originalPrice: 100 },
-  { id: 'torniag', city1: 'Niagara Falls', city2: "Pearson Airport (YYZ)", price: 275, originalPrice: 290 },
-  { id: 'torbill', city1: 'Toronto', city2: "Billy Bishop", price: 75, originalPrice: 90 },
-  { id: 'tormun', city1: 'Toronto', city2: "John C. Munro", price: 150, originalPrice: 160 },
 ];
 
 // List of Ontario cities for validation
