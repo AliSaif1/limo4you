@@ -51,28 +51,28 @@ const AIRPORT_OPTIONS = [
 ];
 
 const FIXED_WITHIN_AND_CITY_CITY = [
-  { id: 'tormis', city1: 'Downtown Toronto', city2: "Mississauga", price: 85, originalPrice: 100 },
-  { id: 'torbra', city1: 'Downtown Toronto', city2: "Brampton", price: 85, originalPrice: 100 },
-  { id: 'torham', city1: 'Downtown Toronto', city2: "Hamilton", price: 150, originalPrice: 170 },
-  { id: 'toryork', city1: 'Downtown Toronto', city2: "Yorkville", price: 95, originalPrice: 115 },
-  { id: 'tormil', city1: 'Downtown Toronto', city2: "Milton", price: 105, originalPrice: 120 },
-  { id: 'torbur', city1: 'Downtown Toronto', city2: "Burlington", price: 125, originalPrice: 140 },
-  { id: 'torsca', city1: 'Downtown Toronto', city2: "Scarborough", price: 80, originalPrice: 95 },
-  { id: 'torpik', city1: 'Downtown Toronto', city2: "Pickering", price: 90, originalPrice: 100 },
-  { id: 'torage', city1: 'Downtown Toronto', city2: "Ajax", price: 100, originalPrice: 115 },
-  { id: 'torwit', city1: 'Downtown Toronto', city2: "Whitby", price: 125, originalPrice: 140 },
-  { id: 'torash', city1: 'Downtown Toronto', city2: "Oshawa", price: 140, originalPrice: 160 },
-  { id: 'torvau', city1: 'Downtown Toronto', city2: "Vaughan", price: 90, originalPrice: 110 },
-  { id: 'torric', city1: 'Downtown Toronto', city2: "Richmond Hill", price: 110, originalPrice: 125 },
-  { id: 'tormar', city1: 'Downtown Toronto', city2: "Markham", price: 110, originalPrice: 125 },
-  { id: 'torsto', city1: 'Downtown Toronto', city2: "Stouffville", price: 125, originalPrice: 140 },
-  { id: 'tornia', city1: 'Downtown Toronto', city2: "Niagara Falls", price: 290, originalPrice: 310 },
-  { id: 'torpea', city1: 'Downtown Toronto', city2: "Pearson Airport (YYZ)", price: 90, originalPrice: 105 },
+  { id: 'tormis', city1: 'Toronto', city2: "Mississauga", price: 85, originalPrice: 100 },
+  { id: 'torbra', city1: 'Toronto', city2: "Brampton", price: 85, originalPrice: 100 },
+  { id: 'torham', city1: 'Toronto', city2: "Hamilton", price: 150, originalPrice: 170 },
+  { id: 'toryork', city1: 'Toronto', city2: "Yorkville", price: 95, originalPrice: 115 },
+  { id: 'tormil', city1: 'Toronto', city2: "Milton", price: 105, originalPrice: 120 },
+  { id: 'torbur', city1: 'Toronto', city2: "Burlington", price: 125, originalPrice: 140 },
+  { id: 'torsca', city1: 'Toronto', city2: "Scarborough", price: 80, originalPrice: 95 },
+  { id: 'torpik', city1: 'Toronto', city2: "Pickering", price: 90, originalPrice: 100 },
+  { id: 'torage', city1: 'Toronto', city2: "Ajax", price: 100, originalPrice: 115 },
+  { id: 'torwit', city1: 'Toronto', city2: "Whitby", price: 125, originalPrice: 140 },
+  { id: 'torash', city1: 'Toronto', city2: "Oshawa", price: 140, originalPrice: 160 },
+  { id: 'torvau', city1: 'Toronto', city2: "Vaughan", price: 90, originalPrice: 110 },
+  { id: 'torric', city1: 'Toronto', city2: "Richmond Hill", price: 110, originalPrice: 125 },
+  { id: 'tormar', city1: 'Toronto', city2: "Markham", price: 110, originalPrice: 125 },
+  { id: 'torsto', city1: 'Toronto', city2: "Stouffville", price: 125, originalPrice: 140 },
+  { id: 'tornia', city1: 'Toronto', city2: "Niagara Falls", price: 290, originalPrice: 310 },
+  { id: 'torpea', city1: 'Toronto', city2: "Pearson Airport (YYZ)", price: 90, originalPrice: 105 },
   { id: 'tormiss', city1: 'Mississauga', city2: "Pearson Airport (YYZ)", price: 85, originalPrice: 100 },
   { id: 'torBram', city1: 'Brampton', city2: "Pearson Airport (YYZ)", price: 85, originalPrice: 100 },
   { id: 'torniag', city1: 'Niagara Falls', city2: "Pearson Airport (YYZ)", price: 275, originalPrice: 290 },
-  { id: 'torbill', city1: 'Downtown Toronto', city2: "Billy Bishop", price: 75, originalPrice: 90 },
-  { id: 'tormun', city1: 'Downtown Toronto', city2: "John C. Munro", price: 150, originalPrice: 160 },
+  { id: 'torbill', city1: 'Toronto', city2: "Billy Bishop", price: 75, originalPrice: 90 },
+  { id: 'tormun', city1: 'Toronto', city2: "John C. Munro", price: 150, originalPrice: 160 },
 ];
 
 // List of Ontario cities for validation
@@ -541,11 +541,6 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
       if (!data || data.error) throw new Error(data.error || 'Unknown error');
 
       const { distance, duration } = data;
-
-      // Block city-to-city if distance is below threshold
-      if (formData.serviceType === 'city' && distance < MIN_CITY_DISTANCE_KM) {
-        alert('City-to-city bookings require a minimum distance of 130 km. Please choose a different destination or select "Within City" service.');
-      }
 
       setDistanceInfo({ distance, duration });
       setFormData(prev => ({ ...prev, distance }));
