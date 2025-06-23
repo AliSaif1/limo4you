@@ -12,9 +12,9 @@ const VEHICLE_TYPES = [
 const SERVICE_TYPES = [
   { id: 'event', name: 'Event Service', pricingType: 'hourly' },
   { id: 'airport', name: 'Airport Pickup', pricingType: 'flat' },
+  { id: 'airportdropoff', name: 'Airport Dropoff', pricingType: 'flat' },
   { id: 'city', name: 'City to City', pricingType: 'distance' },
-  { id: 'withinCity', name: 'City/Airport Drop Offs', pricingType: 'cityDistance' },
-
+  { id: 'withinCity', name: 'City Trip', pricingType: 'cityDistance' },
 ];
 
 const AIRPORT_OPTIONS = [
@@ -25,9 +25,9 @@ const AIRPORT_OPTIONS = [
     originalPrice: 140,
     destinations: [
       { id: 'downtown', name: 'Downtown Toronto', price: 105, originalPrice: 120, },
-      { id: 'mississauga', name: 'Mississauga', price: 85, originalPrice: 100, },
-      { id: 'brampton', name: 'Brampton', price: 85, originalPrice: 100, },
-      { id: 'niagra', name: 'Niagara Falls', price: 275, originalPrice: 290, },
+      { id: 'mississauga', name: 'Mississauga', price: 100, originalPrice: 115, },
+      { id: 'brampton', name: 'Brampton', price: 100, originalPrice: 115, },
+      { id: 'niagra', name: 'Niagara Falls', price: 290, originalPrice: 300, },
     ]
   },
   {
@@ -48,6 +48,69 @@ const AIRPORT_OPTIONS = [
       { id: 'toronto', name: 'Toronto Downtown', price: 150, originalPrice: 170, },
     ]
   },
+];
+
+const AIRPORT_DROPOFF_OPTIONS = [
+  {
+    id: 'downtown',
+    name: 'Downtown Toronto',
+    destinations: [
+      {
+        id: 'yyz',
+        name: 'Toronto Pearson International Airport (YYZ)',
+        price: 90,
+        originalPrice: 115
+      },
+      {
+        id: 'ytz',
+        name: 'Billy Bishop Toronto City Airport (YTZ)',
+        price: 75,
+        originalPrice: 95
+      },
+      {
+        id: 'yhm',
+        name: 'John C. Munro Hamilton International Airport (YHM)',
+        price: 150,
+        originalPrice: 170
+      }
+    ]
+  },
+  {
+    id: 'mississauga',
+    name: 'Mississauga',
+    destinations: [
+      {
+        id: 'yyz',
+        name: 'Toronto Pearson International Airport (YYZ)',
+        price: 85,
+        originalPrice: 100
+      }
+    ]
+  },
+  {
+    id: 'brampton',
+    name: 'Brampton',
+    destinations: [
+      {
+        id: 'yyz',
+        name: 'Toronto Pearson International Airport (YYZ)',
+        price: 85,
+        originalPrice: 100
+      }
+    ]
+  },
+  {
+    id: 'niagra',
+    name: 'Niagara Falls',
+    destinations: [
+      {
+        id: 'yyz',
+        name: 'Toronto Pearson International Airport (YYZ)',
+        price: 275,
+        originalPrice: 290
+      }
+    ]
+  }
 ];
 
 const FIXED_WITHIN_AND_CITY_CITY = [
@@ -501,7 +564,6 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   const [pickupCoords, setPickupCoords] = useState(null);
   const [destinationCoords, setDestinationCoords] = useState(null);
 
-
   // Calculate distance when service type is city-to-city or within city and both locations are entered
   useEffect(() => {
     const isCityService = formData.serviceType === 'city' || formData.serviceType === 'withinCity';
@@ -523,6 +585,24 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
           setFormData(prev => ({
             ...prev,
             destination: selectedAirport.destinations[0].name
+          }));
+        }
+      }
+    }
+  }, [formData.pickup, formData.serviceType]);
+
+  useEffect(() => {
+    if (formData.serviceType === 'airportdropoff' && formData.pickup) {
+      const selectedCity = AIRPORT_DROPOFF_OPTIONS.find(
+        city => city.name === formData.pickup
+      );
+      if (selectedCity) {
+        setAvailableDestinations(selectedCity.destinations);
+        // Set the first destination as default
+        if (selectedCity.destinations.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            destination: selectedCity.destinations[0].name
           }));
         }
       }
@@ -664,7 +744,11 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         {/* Pickup Location */}
         <div>
           <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            {formData.serviceType === 'airport' ? 'Arrival Airport' : 'Pickup Location'}
+            {formData.serviceType === 'airport'
+              ? 'Arrival Airport'
+              : formData.serviceType === 'airportdropoff'
+                ? 'Pickup Location'
+                : 'Pickup Location'}
           </h3>
           {formData.serviceType === 'airport' ? (
             <select
@@ -679,6 +763,22 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
               {AIRPORT_OPTIONS.map(airport => (
                 <option key={airport.id} value={airport.name}>
                   {airport.name}
+                </option>
+              ))}
+            </select>
+          ) : formData.serviceType === 'airportdropoff' ? (
+            <select
+              name="pickup"
+              value={formData.pickup}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800 ${errors.pickup ? 'border-red-500' : 'border-gray-300'
+                }`}
+              required
+            >
+              <option value="">Select City</option>
+              {AIRPORT_DROPOFF_OPTIONS.map(city => (
+                <option key={city.id} value={city.name}>
+                  {city.name}
                 </option>
               ))}
             </select>
@@ -720,7 +820,9 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
         {/* Destination */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Destination</h3>
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">
+            {formData.serviceType === 'airportdropoff' ? 'Destination Airport' : 'Destination'}
+          </h3>
           {formData.serviceType === 'airport' ? (
             <select
               name="destination"
@@ -738,6 +840,25 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
                 ))
               ) : (
                 <option value="">Select pickup airport first</option>
+              )}
+            </select>
+          ) : formData.serviceType === 'airportdropoff' ? (
+            <select
+              name="destination"
+              value={formData.destination}
+              onChange={handleInputChange}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800 ${errors.destination ? 'border-red-500' : 'border-gray-300'
+                }`}
+              required
+            >
+              {availableDestinations.length > 0 ? (
+                availableDestinations.map(destination => (
+                  <option key={destination.id} value={destination.name}>
+                    {destination.name} (${destination.price})
+                  </option>
+                ))
+              ) : (
+                <option value="">Select pickup city first</option>
               )}
             </select>
           ) : (
@@ -828,15 +949,16 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
           onClick={onNext}
           disabled={
             !formData.pickup ||
-            (formData.serviceType !== 'airport' && !formData.destination) ||
+            !formData.destination ||
             (formData.serviceType === 'city' && !pickupValidation.isValid) ||
             (formData.serviceType === 'withinCity' && !pickupValidation.isValid)
           }
           className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.pickup ||
-            (formData.serviceType !== 'airport' && !formData.destination) ||
+            !formData.destination ||
             (formData.serviceType === 'city' && !pickupValidation.isValid) ||
             (formData.serviceType === 'withinCity' && !pickupValidation.isValid)
-            ? 'opacity-50 cursor-not-allowed' : ''
+            ? 'opacity-50 cursor-not-allowed'
+            : ''
             }`}
         >
           Next
@@ -971,19 +1093,35 @@ const ContactDetails = ({ formData, setFormData, setErrors, errors, onNext, onBa
 };
 
 // Helper to get fixed rate for city pair (bidirectional)
+const isCanadianAddress = (str) => str.toLowerCase().includes("canada");
+
 const getFixedRateForCities = (pickup, destination) => {
   if (!pickup || !destination) return null;
-  return FIXED_WITHIN_AND_CITY_CITY.find(
-    pair =>
-      (pair.city1.toLowerCase() === pickup.toLowerCase() && pair.city2.toLowerCase() === destination.toLowerCase()) ||
-      (pair.city2.toLowerCase() === pickup.toLowerCase() && pair.city1.toLowerCase() === destination.toLowerCase())
-  );
+
+  const pickupLower = pickup.toLowerCase();
+  const destinationLower = destination.toLowerCase();
+
+  if (!isCanadianAddress(pickupLower) || !isCanadianAddress(destinationLower)) {
+    return null; // One or both addresses are not in Canada
+  }
+
+  return FIXED_WITHIN_AND_CITY_CITY.find(pair => {
+    const city1 = pair.city1.toLowerCase();
+    const city2 = pair.city2.toLowerCase();
+    return (
+      (pickupLower.includes(city1) && destinationLower.includes(city2)) ||
+      (pickupLower.includes(city2) && destinationLower.includes(city1))
+    );
+  });
 };
 
 const ReservationSummary = ({ formData, onSubmit, onBack }) => {
   const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
   const selectedAirport = formData.serviceType === 'airport'
     ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
+    : null;
+  const selectedCityAirport = formData.serviceType === 'airportdropoff'
+    ? AIRPORT_DROPOFF_OPTIONS.find(a => formData.pickup.includes(a.name))
     : null;
   const selectedService = SERVICE_TYPES.find(s => s.id === formData.serviceType);
 
@@ -1000,6 +1138,13 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
   if (formData.serviceType === 'airport') {
     const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
     const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
+
+    totalPrice = destinationPrice;
+    originalPrice = destinationOriginalPrice;
+    pricingDescription = 'Flat rate';
+  } else if (formData.serviceType === 'airportdropoff') {
+    const destinationPrice = selectedCityAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedCityAirport?.price || 0;
+    const destinationOriginalPrice = selectedCityAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedCityAirport?.originalPrice || 0;
 
     totalPrice = destinationPrice;
     originalPrice = destinationOriginalPrice;
@@ -1203,6 +1348,9 @@ const BookingSummary = ({ formData }) => {
   const selectedAirport = formData.serviceType === 'airport'
     ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
     : null;
+  const selectedCityAirport = formData.serviceType === 'airportdropoff'
+    ? AIRPORT_DROPOFF_OPTIONS.find(a => formData.pickup.includes(a.name))
+    : null;
   const selectedService = SERVICE_TYPES.find(s => s.id === formData.serviceType);
 
   const duration = formData.serviceType === 'event'
@@ -1217,6 +1365,11 @@ const BookingSummary = ({ formData }) => {
   if (formData.serviceType === 'airport') {
     const destinationPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedAirport?.price || 0;
     const destinationOriginalPrice = selectedAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedAirport?.originalPrice || 0;
+    totalPrice = destinationPrice;
+    originalPrice = destinationOriginalPrice;
+  } else if (formData.serviceType === 'airportdropoff') {
+    const destinationPrice = selectedCityAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedCityAirport?.price || 0;
+    const destinationOriginalPrice = selectedCityAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedCityAirport?.originalPrice || 0;
     totalPrice = destinationPrice;
     originalPrice = destinationOriginalPrice;
   } else if (formData.serviceType === 'event') {
@@ -1499,15 +1652,21 @@ const BookingForm = () => {
       if (formData.serviceType === 'airport' && !formData.flightNumber) stepErrors.flightNumber = 'Please enter flight number';
     } if (step === 2) {
       if (!formData.pickup) stepErrors.pickup = 'Pickup location is required';
-      if (formData.serviceType !== 'airport' && !formData.destination)
-        stepErrors.destination = 'Destination is required';
 
-      // Enforce distance constraints
-      if (formData.serviceType === 'city' && (!formData.distance || formData.distance < MIN_CITY_DISTANCE_KM)) {
+      if (formData.serviceType !== 'airport' && !formData.destination) {
+        stepErrors.destination = 'Destination is required';
+      }
+
+      // Skip min distance check if fixed city pair exists
+      const fixedMatch = getFixedRateForCities(formData.pickup, formData.destination);
+
+      if (
+        formData.serviceType === 'city' &&
+        (!fixedMatch && (!formData.distance || formData.distance < MIN_CITY_DISTANCE_KM))
+      ) {
         stepErrors.distance = `Minimum distance for city-to-city booking is ${MIN_CITY_DISTANCE_KM} km`;
       }
-    }
-    else if (step === 3) {
+    } else if (step === 3) {
       if (!formData.name) stepErrors.name = 'Name is required';
       if (!formData.email) stepErrors.email = 'Email is required';
       if (!formData.phone) stepErrors.phone = 'Phone number is required';
