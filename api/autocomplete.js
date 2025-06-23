@@ -13,21 +13,24 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://api.locationiq.com/v1/autocomplete?key=${apiKey}&q=${encodeURIComponent(value)}&limit=10&dedupe=1&countrycodes=ca,us&normalizecity=1`
+      `https://api.locationiq.com/v1/autocomplete?key=${API_KEY}&q=${encodeURIComponent(input)}&limit=10&dedupe=1&countrycodes=ca,us&normalizecity=1`,
+      {
+        headers: {
+          'User-Agent': 'Limo4All/1.0 (contact@yourdomain.com)' // Optional but helpful
+        }
+      }
     );
 
     const data = await response.json();
 
     if (!Array.isArray(data)) {
-      return res.status(500).json({ error: 'LocationIQ API error' });
+      console.error('LocationIQ API returned error:', data);
+      return res.status(500).json({ error: 'LocationIQ API error', detail: data });
     }
 
-    // Convert LocationIQ results to mimic Google's format
     const predictions = data.map((item) => ({
       description: item.display_name,
-      terms: item.display_name
-        .split(',')
-        .map((term) => ({ value: term.trim() })),
+      terms: item.display_name.split(',').map((term) => ({ value: term.trim() })),
       lat: item.lat,
       lon: item.lon,
     }));
