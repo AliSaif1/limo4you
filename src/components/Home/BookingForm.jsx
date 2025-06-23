@@ -13,7 +13,6 @@ const SERVICE_TYPES = [
   { id: 'event', name: 'Event Service', pricingType: 'hourly' },
   { id: 'airport', name: 'Airport Pickup', pricingType: 'flat' },
   { id: 'city', name: 'City to City', pricingType: 'distance' },
-  { id: 'city', name: 'Pick & Drop', pricingType: 'distance' },
 ];
 
 const AIRPORT_OPTIONS = [
@@ -283,6 +282,20 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
                   <div className="font-semibold text-gray-800">{vehicle.name}</div>
                   <div className="text-sm text-gray-500">{vehicle.capacity} passengers max</div>
                 </div>
+                <div className="flex flex-col items-center mt-1">
+                  {formData.serviceType === 'city' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm line-through text-gray-500">${vehicle.originalKmPrice}/km</span>
+                      <span className="text-sm font-semibold text-primary">${vehicle.perKmPrice}/km</span>
+                    </div>
+                  )}
+                  {formData.serviceType !== 'city' && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm line-through text-gray-500">${vehicle.originalHourlyPrice}/hr</span>
+                      <span className="text-sm font-semibold text-primary">${vehicle.hourlyPrice}/hr</span>
+                    </div>
+                  )}
+                </div>
               </button>
             ))}
           </div>
@@ -451,39 +464,27 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
   const calculateDistanceAndUpdate = async () => {
     setDistanceLoading(true);
+
     try {
-      const { distance, duration } = await calculateDistance(formData.pickup, formData.destination);
+      const { distance, duration } = await calculateDistance(
+        formData.pickup,
+        formData.destination
+      );
 
       const distanceInKm = distance.value / 1000;
 
+      // Block city-to-city if distance is below threshold
       if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
         setDistanceInfo(null);
-        setFormData(prev => ({ ...prev, distance: null, estimatedPrice: null }));
-        alert('Minimum distance for city-to-city booking must be at least 50 km.');
+        setFormData(prev => ({ ...prev, distance: null }));
+        alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.');
         return;
       }
 
-      // Get selected vehicle
-      const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
-
-      if (!selectedVehicle) {
-        console.warn('No vehicle selected');
-        return;
-      }
-
-      // Determine per km price based on distance
-      const perKmPrice = distanceInKm >= MIN_CITY_DISTANCE_KM ? 2.5 : 3.5;
-
-      const estimatedPrice = parseFloat((distanceInKm * perKmPrice).toFixed(2));
-
-      // Update state
+      // Proceed normally
       setDistanceInfo({ distance, duration });
-      setFormData(prev => ({
-        ...prev,
-        distance: distance,
-        estimatedPrice,
-        perKmPrice
-      }));
+      setFormData(prev => ({ ...prev, distance }));
+
     } catch (error) {
       console.error('Failed to calculate distance:', error);
       setDistanceInfo(null);
