@@ -568,15 +568,32 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
   const fetchSuggestions = async (value, name) => {
     try {
-      const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(value)}`);
-      const predictions = await res.json();
+      // const apiKey = process.env.REACT_APP_LOCATIONIQ_API_KEY || process.env.NEXT_PUBLIC_LOCATIONIQ_API_KEY;
+
+      const url = '/api/autocomplete';
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        console.error('LocationIQ API returned an error:', data);
+        return;
+      }
+
+      // Match the Google-style shape
+      const predictions = data.map((item) => ({
+        description: item.display_name,
+        terms: item.display_name.split(',').map((term) => ({ value: term.trim() })),
+        lat: item.lat,
+        lon: item.lon,
+      }));
 
       let filteredPredictions = predictions;
 
       if (name === 'pickup') {
         filteredPredictions = predictions.filter(prediction =>
           prediction.terms.some(term =>
-            term.value.toLowerCase() === 'ontario' || term.value.toLowerCase() === 'on'
+            ['ontario', 'on'].includes(term.value.toLowerCase())
           )
         );
         setPickupSuggestions(filteredPredictions);
@@ -592,7 +609,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         setShowDestinationSuggestions(true);
       }
     } catch (err) {
-      console.error('Failed to fetch suggestions:', err);
+      console.error('Failed to fetch LocationIQ suggestions:', err);
     }
   };
 

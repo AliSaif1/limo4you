@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      `https://api.locationiq.com/v1/autocomplete?key=${API_KEY}&q=${encodeURIComponent(input)}&limit=5&dedupe=1&countrycodes=ca,us&normalizecity=1`
+      `https://api.locationiq.com/v1/autocomplete?key=${apiKey}&q=${encodeURIComponent(value)}&limit=10&dedupe=1&countrycodes=ca,us&normalizecity=1`
     );
 
     const data = await response.json();
