@@ -887,8 +887,8 @@ const ReservationSummary = ({ formData, onSubmit, onBack }) => {
     pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
   } else if (formData.serviceType === 'city') {
     const distance = formData.distance || 0;
-    const rate = distance > 50 ? 2.5 : 3.5;
-    const originalRate = distance > 50 ? 2.5 : 4;
+    const rate = distance > 50 ? 2.5 : 6;
+    const originalRate = distance > 50 ? 2.5 : 7;
 
     totalPrice = distance * rate;
     originalPrice = distance * originalRate;
@@ -1092,8 +1092,8 @@ const BookingSummary = ({ formData }) => {
     originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
   } else if (formData.serviceType === 'city') {
     const distance = formData.distance || 0;
-    const rate = distance > 50 ? 2.5 : 3.5;
-    const originalRate = distance > 50 ? 2.5 : 4;
+    const rate = distance > 50 ? 2.5 : 6;
+    const originalRate = distance > 50 ? 2.5 : 7;
 
     totalPrice = distance * rate;
     originalPrice = distance * originalRate;
@@ -1279,8 +1279,8 @@ const BookingForm = () => {
         pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
       } else if (formData.serviceType === 'city') {
         const distance = formData.distance || 0;
-        const rate = distance > 50 ? 2.5 : 3.5;
-        const originalRate = distance > 50 ? 2.5 : 4;
+        const rate = distance > 50 ? 2.5 : 6;
+        const originalRate = distance > 50 ? 2.5 : 7;
 
         totalPrice = distance * rate;
         originalPrice = distance * originalRate;
