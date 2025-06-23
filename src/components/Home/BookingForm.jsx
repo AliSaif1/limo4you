@@ -1532,6 +1532,7 @@ const BookingForm = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [apiError, setApiError] = useState(null);
+  const fixedMatch = getFixedRateForCities(formData.pickup, formData.destination);
 
   const handleSubmit = async () => {
     setShowConfirmation(false);
@@ -1543,6 +1544,9 @@ const BookingForm = () => {
       const selectedVehicle = VEHICLE_TYPES.find(v => v.id === formData.vehicleType);
       const selectedAirport = formData.serviceType === 'airport'
         ? AIRPORT_OPTIONS.find(a => formData.pickup.includes(a.name))
+        : null;
+      const selectedCityAirport = formData.serviceType === 'airportdropoff'
+        ? AIRPORT_DROPOFF_OPTIONS.find(a => formData.pickup.includes(a.name))
         : null;
 
       let totalPrice = 0;
@@ -1557,11 +1561,22 @@ const BookingForm = () => {
         totalPrice = destinationPrice;
         originalPrice = destinationOriginalPrice;
         pricingDescription = 'Flat rate';
+      } else if (formData.serviceType === 'airportdropoff') {
+        const destinationPrice = selectedCityAirport?.destinations?.find(d => d.name === formData.destination)?.price || selectedCityAirport?.price || 0;
+        const destinationOriginalPrice = selectedCityAirport?.destinations?.find(d => d.name === formData.destination)?.originalPrice || selectedCityAirport?.originalPrice || 0;
+        totalPrice = destinationPrice;
+        originalPrice = destinationOriginalPrice;
+        pricingDescription = 'Flat rate';
       } else if (formData.serviceType === 'event') {
         const duration = calculateDuration(formData.pickupTime, formData.dropoffTime);
         totalPrice = (selectedVehicle?.hourlyPrice || 0) * duration;
         originalPrice = (selectedVehicle?.originalHourlyPrice || 0) * duration;
         pricingDescription = `${duration} hours × $${selectedVehicle?.hourlyPrice}/hr`;
+      } else if (fixedMatch && (formData.serviceType === 'city' || formData.serviceType === 'withinCity')) {
+        // Apply fixed pricing for city and withinCity types
+        totalPrice = fixedMatch.price;
+        originalPrice = fixedMatch.originalPrice;
+        pricingDescription = `Flat rate for ${fixedMatch.city1} ↔ ${fixedMatch.city2}`;
       } else if (formData.serviceType === 'city') {
         totalPrice = (selectedVehicle?.perKmPrice || 0) * (formData.distance || 0);
         originalPrice = (selectedVehicle?.originalKmPrice || 0) * (formData.distance || 0);
