@@ -493,13 +493,18 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
   const [distanceInfo, setDistanceInfo] = useState(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [availableDestinations, setAvailableDestinations] = useState([]);
+  const [pickupSelected, setPickupSelected] = useState(false);
+  const [destinationSelected, setDestinationSelected] = useState(false);
+
 
   // Calculate distance when service type is city-to-city or within city and both locations are entered
   useEffect(() => {
-    if ((formData.serviceType === 'city' || formData.serviceType === 'withinCity') && formData.pickup && formData.destination) {
+    const isCityService = formData.serviceType === 'city' || formData.serviceType === 'withinCity';
+
+    if (isCityService && pickupSelected && destinationSelected && formData.pickup && formData.destination) {
       calculateDistanceAndUpdate();
     }
-  }, [formData.serviceType, formData.pickup, formData.destination]);
+  }, [formData.serviceType, formData.pickup, formData.destination, pickupSelected, destinationSelected]);
 
   useEffect(() => {
     if (formData.serviceType === 'airport' && formData.pickup) {
@@ -551,19 +556,19 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
+    if (name === 'pickup') setPickupSelected(false);
+    if (name === 'destination') setDestinationSelected(false);
+
     if (value.length < 3) {
       if (name === 'pickup') setPickupSuggestions([]);
       else setDestinationSuggestions([]);
       return;
     }
 
-    // Clear previous debounce
     clearTimeout(debounceRef.current);
-
-    // Debounce API call
     debounceRef.current = setTimeout(() => {
       fetchSuggestions(value, name);
-    }, 500); // 500ms delay
+    }, 500);
   };
 
   const fetchSuggestions = async (value, name) => {
@@ -615,9 +620,10 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
   const selectSuggestion = (suggestion, field) => {
     setFormData(prev => ({ ...prev, [field]: suggestion.description }));
+
     if (field === 'pickup') {
+      setPickupSelected(true);
       setShowPickupSuggestions(false);
-      // Validate Ontario pickup after selection
       if (formData.serviceType === 'city' || formData.serviceType === 'withinCity') {
         const isValid = validateOntarioPickup(suggestion.description);
         setPickupValidation({
@@ -626,6 +632,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
         });
       }
     } else {
+      setDestinationSelected(true);
       setShowDestinationSuggestions(false);
     }
   };

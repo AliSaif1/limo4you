@@ -1,39 +1,73 @@
-// /pages/api/distance.js
-
 export default async function handler(req, res) {
-    if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const { origin, destination } = req.query;
+
+  if (!origin || !destination) {
+    return res.status(400).json({ error: 'Origin and destination are required' });
+  }
+
+  const API_KEY = process.env.ORS_API_KEY;
+
+  try {
+    // First, geocode origin and destination to get coordinates
+    const geocode = async (query) => {
+      const geoRes = await fetch(
+        `https://api.openrouteservice.org/geocode/search?api_key=${API_KEY}&text=${encodeURIComponent(query)}&boundary.country=CA&size=1`
+      );
+      const geoData = await geoRes.json();
+
+      if (!geoData.features || geoData.features.length === 0) {
+        throw new Error(`No results found for: ${query}`);
+      }
+
+      return geoData.features[0].geometry.coordinates; // [lon, lat]
+    };
+
+    const [originCoord, destinationCoord] = await Promise.all([
+      geocode(origin),
+      geocode(destination)
+    ]);
+
+    // Now call Matrix API
+    const matrixRes = await fetch('https://api.openrouteservice.org/v2/matrix/driving-car', {
+      method: 'POST',
+      headers: {
+        'Authorization': API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        locations: [originCoord, destinationCoord],
+        metrics: ['distance', 'duration'],
+        units: 'km'
+      })
+    });
+
+    const matrixData = await matrixRes.json();
+
+    if (!matrixData.distances || !matrixData.durations) {
+      throw new Error('Invalid matrix response');
     }
 
-    const { origin, destination } = req.query;
+    const distance = matrixData.distances[0][1]; // in kilometers
+    const durationSec = matrixData.durations[0][1]; // in seconds
 
-    if (!origin || !destination) {
-        return res.status(400).json({ error: 'Origin and destination required' });
-    }
+    const formatDuration = (seconds) => {
+      const minutes = Math.round(seconds / 60);
+      if (minutes < 60) return `${minutes} min`;
+      const hours = Math.floor(minutes / 60);
+      const mins = minutes % 60;
+      return `${hours} hr ${mins} min`;
+    };
 
-    const API_KEY = process.env.GOOGLE_API_KEY;
-
-    try {
-        const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&key=${API_KEY}`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.status !== 'OK') {
-            return res.status(500).json({ error: data.error_message || 'Failed to fetch distance' });
-        }
-
-        const element = data.rows[0].elements[0];
-        if (element.status !== 'OK') {
-            return res.status(400).json({ error: 'Invalid location data' });
-        }
-
-        return res.status(200).json({
-            distance: element.distance.value / 1000, // kilometers
-            duration: element.duration.text,
-        });
-    } catch (error) {
-        console.error('Distance API Error:', error);
-        return res.status(500).json({ error: 'Server error' });
-    }
+    return res.status(200).json({
+      distance,
+      duration: formatDuration(durationSec),
+    });
+  } catch (error) {
+    console.error('ORS Distance API Error:', error);
+    return res.status(500).json({ error: error.message || 'Server error' });
+  }
 }
