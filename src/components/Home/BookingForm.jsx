@@ -446,6 +446,7 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
 };
 
 const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) => {
+  const [isDistanceValid, setIsDistanceValid] = useState(true);
   const debounceRef = useRef();
   const [pickupSuggestions, setPickupSuggestions] = useState([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState([]);
@@ -464,6 +465,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
   const calculateDistanceAndUpdate = async () => {
     setDistanceLoading(true);
+    setIsDistanceValid(true); // Reset validation at start
 
     try {
       const { distance, duration } = await calculateDistance(
@@ -475,19 +477,21 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
       // Block city-to-city if distance is below threshold
       if (formData.serviceType === 'city' && distanceInKm < MIN_CITY_DISTANCE_KM) {
-        setDistanceInfo(null);
+        setDistanceInfo({ message: 'City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.', distance: 0 });
         setFormData(prev => ({ ...prev, distance: null }));
-        alert('City-to-city bookings require a minimum distance of 50 km. Please choose a different destination.');
+        setIsDistanceValid(false);
         return;
       }
 
       // Proceed normally
       setDistanceInfo({ distance, duration });
       setFormData(prev => ({ ...prev, distance }));
+      setIsDistanceValid(true);
 
     } catch (error) {
       console.error('Failed to calculate distance:', error);
       setDistanceInfo(null);
+      setIsDistanceValid(false);
     } finally {
       setDistanceLoading(false);
     }
@@ -679,9 +683,11 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
               {distanceLoading ? (
                 <div className="w-full pl-10 pr-4 py-2 text-gray-500">Calculating distance...</div>
+              ) : distanceInfo?.message ? (
+                <div className="w-full pl-10 pr-4 py-2 text-red-500">{distanceInfo.message}</div>
               ) : distanceInfo ? (
                 <div className="w-full pl-10 pr-4 py-2 text-gray-800">
-                  {distanceInfo.distance.toFixed(1)} km ({distanceInfo.duration})
+                  {(distanceInfo.distance.value / 1000).toFixed(1)} km ({distanceInfo.duration.text})
                 </div>
               ) : (
                 <div className="w-full pl-10 pr-4 py-2 text-gray-500">
@@ -724,12 +730,15 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
           disabled={
             !formData.pickup ||
             (formData.serviceType !== 'airport' && !formData.destination) ||
-            (formData.serviceType === 'city' && !pickupValidation.isValid)
+            (formData.serviceType === 'city' && !pickupValidation.isValid) ||
+            (formData.serviceType === 'city' && !isDistanceValid)
           }
           className={`bg-primary hover:bg-primary/90 text-white font-medium py-2 px-6 rounded-lg transition ${!formData.pickup ||
             (formData.serviceType !== 'airport' && !formData.destination) ||
-            (formData.serviceType === 'city' && !pickupValidation.isValid)
-            ? 'opacity-50 cursor-not-allowed' : ''
+            (formData.serviceType === 'city' && !pickupValidation.isValid) ||
+            (formData.serviceType === 'city' && !isDistanceValid)
+            ? 'opacity-50 cursor-not-allowed'
+            : ''
             }`}
         >
           Next
