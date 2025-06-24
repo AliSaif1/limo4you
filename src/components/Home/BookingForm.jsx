@@ -10,11 +10,11 @@ const VEHICLE_TYPES = [
 ];
 
 const SERVICE_TYPES = [
-  { id: 'event', name: 'Event Service', pricingType: 'hourly' },
-  { id: 'airport', name: 'Airport Pickup', pricingType: 'flat' },
-  { id: 'airportdropoff', name: 'Airport Dropoff', pricingType: 'flat' },
-  { id: 'city', name: 'City to City', pricingType: 'distance' },
-  { id: 'withinCity', name: 'City Trip', pricingType: 'cityDistance' },
+  { id: 'event', name: 'Hourly In-City (Event / Special)', pricingType: 'hourly' },
+  { id: 'airport', name: 'Airport Pickup (Flat Rate)', pricingType: 'flat' },
+  { id: 'airportdropoff', name: 'Airport Dropoff (Flat Rate)', pricingType: 'flat' },
+  { id: 'city', name: 'Intercity Travel (Per KM)', pricingType: 'distance' },
+  { id: 'withinCity', name: 'Point-to-Point In-City (Per KM)', pricingType: 'cityDistance' },
 ];
 
 const AIRPORT_OPTIONS = [
@@ -329,25 +329,6 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
       </h2>
 
       <div className="space-y-6">
-        {/* Service Type Selection */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">Service Type</h3>
-          <select
-            name="serviceType"
-            value={formData.serviceType || ''}
-            onChange={handleServiceTypeChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800"
-            required
-          >
-            <option value="">Select service type</option>
-            {SERVICE_TYPES.map(service => (
-              <option key={service.id} value={service.id}>
-                {service.name}
-              </option>
-            ))}
-          </select>
-          {errors.serviceType && <p className="text-red-500 text-xs mt-2">{errors.serviceType}</p>}
-        </div>
 
         {/* Vehicle Selection */}
         <div>
@@ -398,6 +379,26 @@ const VehicleDateTimeSelection = ({ formData, setFormData, errors, onNext }) => 
             ))}
           </div>
           {errors.vehicleType && <p className="text-red-500 text-xs mt-2">{errors.vehicleType}</p>}
+        </div>
+
+        {/* Service Type Selection */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-700 mb-3">Service Type</h3>
+          <select
+            name="serviceType"
+            value={formData.serviceType || ''}
+            onChange={handleServiceTypeChange}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-800"
+            required
+          >
+            <option value="">Select service type</option>
+            {SERVICE_TYPES.map(service => (
+              <option key={service.id} value={service.id}>
+                {service.name}
+              </option>
+            ))}
+          </select>
+          {errors.serviceType && <p className="text-red-500 text-xs mt-2">{errors.serviceType}</p>}
         </div>
 
         {/* Date Selection */}
@@ -969,7 +970,7 @@ const ContactDetails = ({ formData, setFormData, setErrors, errors, onNext, onBa
   };
 
   const validatePhone = (phone) => {
-    const re = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/;
+    const re = /^(?:\+1\s?)?(?:\(?[2-9][0-9]{2}\)?[\s.-]?)?[2-9][0-9]{2}[\s.-]?[0-9]{4}$/;
     return re.test(phone);
   };
 
@@ -1512,7 +1513,7 @@ function calculateDuration(startTime, endTime) {
 const BookingForm = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    serviceType: 'event',
+    serviceType: '',
     vehicleType: 'suv',
     pickup: '',
     destination: '',
@@ -1533,6 +1534,17 @@ const BookingForm = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [apiError, setApiError] = useState(null);
   const fixedMatch = getFixedRateForCities(formData.pickup, formData.destination);
+  const stepContentRef = useRef(null);
+
+  // Auto-scroll to top when step changes
+  useEffect(() => {
+    if (stepContentRef.current) {
+      window.scrollTo({
+        top: stepContentRef.current.offsetTop - 100,
+        behavior: 'smooth'
+      });
+    }
+  }, [step]);
 
   const handleSubmit = async () => {
     setShowConfirmation(false);
@@ -1726,7 +1738,9 @@ const BookingForm = () => {
               className={`flex flex-col lg:flex-row gap-8 ${step === 4 ? 'lg:justify-center' : ''
                 }`}
             >
-              <div className={`${step === 4 ? 'lg:w-full max-w-3xl mx-auto' : 'lg:w-2/3'}`}>
+              <div
+                ref={stepContentRef}
+                className={`${step === 4 ? 'lg:w-full max-w-3xl mx-auto' : 'lg:w-2/3'}`}>
                 {/* Step 1: Vehicle & DateTime Selection */}
                 {step === 1 && (
                   <VehicleDateTimeSelection

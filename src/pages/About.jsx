@@ -14,7 +14,7 @@ function About() {
         />
         <div className="relative z-20 text-center px-4">
           <span className="inline-block bg-white text-primary px-4 py-2 rounded-full text-sm font-medium tracking-wider uppercase mb-6 shadow-lg">
-            Since 2010
+            Since 2023
           </span>
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 font-serif tracking-tight">
             Redefining <span className="text-secondary">Luxury</span> Travel
@@ -26,7 +26,7 @@ function About() {
       </div>
 
       {/* Our Story - Modern Timeline Design */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="relative">
             <div className="absolute -left-8 top-0 h-full w-0.5 bg-gradient-to-b from-primary to-secondary hidden lg:block"></div>
@@ -37,7 +37,7 @@ function About() {
                   Our <span className="text-primary">Journey</span>
                 </h2>
                 <p className="text-lg text-gray-600 mb-6">
-                  Founded in 2010 with a single Lincoln Town Car, Limo4All has grown into the region's premier luxury transportation provider through relentless focus on service excellence.
+                  Founded in 2023 with a single Lincoln Town Car, Limo4All has grown into the region's premier luxury transportation provider through relentless focus on service excellence.
                 </p>
               </div>
 
@@ -75,7 +75,7 @@ function About() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Core Values - Card Grid */}
       <div className="bg-gray-50 py-24">
