@@ -114,7 +114,7 @@ const Hero = () => {
             <motion.div variants={itemVariants}>
               <span className="inline-flex items-center bg-secondary/20 text-secondary px-4 py-2 rounded-full text-sm font-semibold mb-4 tracking-wider">
                 <Sparkle size={14} className="mr-2" />
-                <span>LUXURY REDEFINED</span>
+                <span>TORONTO'S PREMIER LUXURY SERVICE</span>
               </span>
             </motion.div>
 
@@ -123,7 +123,7 @@ const Hero = () => {
               variants={itemVariants}
               itemProp="name"
             >
-              <span className="text-secondary">Executive</span> Transportation <br className="hidden md:block" />For Discerning Clients
+              <span className="text-secondary">Executive Transportation</span>  <br className="hidden md:block" /> Serving Toronto & Surrounding Areas
             </motion.h1>
 
             <motion.p
@@ -131,8 +131,9 @@ const Hero = () => {
               variants={itemVariants}
               itemProp="description"
             >
-              Experience <strong>unmatched luxury</strong> with our premium fleet of limousines and professional chauffeurs.
-              Punctual, discreet service tailored to your exact requirements for corporate events, weddings, and special occasions.
+              Experience <strong>unmatched luxury</strong> with our premium fleet serving all of Greater Toronto Area.
+              Punctual, discreet service for corporate events, weddings, and special occasions throughout Toronto,
+              Vaughan, Mississauga, Newmarket, Barrie, Simcoe, and all GTA regions.
             </motion.p>
 
             {/* ✅ Structured Offer for LocalBusiness */}

@@ -672,9 +672,7 @@ const LocationPassengers = ({ formData, setFormData, errors, onNext, onBack }) =
 
       if (name === 'pickup') {
         filteredPredictions = predictions.filter(prediction =>
-          prediction.terms.some(term =>
-            ['ontario', 'on'].includes(term.value.toLowerCase())
-          )
+          prediction.description.toLowerCase().includes('canada')
         );
         setPickupSuggestions(filteredPredictions);
         setShowPickupSuggestions(true);
@@ -1714,7 +1712,7 @@ const BookingForm = () => {
         <div className="p-6 sm:p-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Luxury SUV Reservation</h1>
-            <p className="text-gray-600">Pick-up from Ontario, Drop-off anywhere in Canada and USA</p>
+            <p className="text-gray-600">Pick-up from anywhere in Canada, Drop-off anywhere in Canada and USA</p>
           </div>
 
           {showSuccess ? (
