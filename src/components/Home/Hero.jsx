@@ -96,7 +96,7 @@ const Hero = () => {
           >
             <div className="relative aspect-[5/3] rounded-2xl overflow-hidden shadow-2xl border-4 border-white/5 group">
               <img
-                src="https://www.limo4all.ca/Hero.png"
+                src="/Hero.png"
                 alt="Luxury limousine with professional chauffeur"
                 className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 loading="eager"

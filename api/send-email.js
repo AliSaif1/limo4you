@@ -38,7 +38,9 @@ export default async function handler(req, res) {
     }
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.hostinger.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_PASS,
@@ -159,7 +161,7 @@ export default async function handler(req, res) {
           
           <div class="contact-info">
             <p><strong>Need immediate assistance?</strong></p>
-            <p>Email: <a href="mailto:booking@limo4all.ca" style="color: #3498db;">booking@limo4all.ca</a></p>
+            <p>Email: <a href="mailto:contact@limo4all.ca" style="color: #3498db;">contact@limo4all.ca</a></p>
             <p>Phone: <a href="tel:+16473131786" style="color: #3498db;">+1 (647) 313- 1786</a></p>
             <p>Hours: 24/7 Customer Support</p>
           </div>

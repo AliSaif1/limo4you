@@ -20,7 +20,9 @@ export default async function handler(req, res) {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.hostinger.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_PASS,
@@ -86,8 +88,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, message: 'Message sent successfully' });
   } catch (error) {
     console.error('Contact form error:', error);
-    return res.status(500).json({ 
-      error: 'Failed to send message. Please try again later or contact us directly.' 
+    return res.status(500).json({
+      error: 'Failed to send message. Please try again later or contact us directly.'
     });
   }
 }

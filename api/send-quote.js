@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ 
+    return res.status(405).json({
       success: false,
       error: 'Method Not Allowed',
       message: 'Only POST requests are accepted'
@@ -24,43 +24,43 @@ export default async function handler(req, res) {
 
     // Comprehensive validation
     const errors = [];
-    
+
     if (!pickup || pickup.trim().length < 3) {
       errors.push('Pickup location must be at least 3 characters');
     }
-    
+
     if (!destination || destination.trim().length < 3) {
       errors.push('Destination must be at least 3 characters');
     }
-    
+
     if (!date || !Date.parse(date)) {
       errors.push('Valid date is required');
     } else if (new Date(date) < new Date()) {
       errors.push('Date cannot be in the past');
     }
-    
+
     if (!slot) {
       errors.push('Time slot is required');
     }
-    
+
     if (!email && !phone) {
       errors.push('Either email or phone number is required');
     }
-    
+
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       errors.push('Valid email address is required');
     }
-    
+
     if (phone && !/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/.test(phone)) {
       errors.push('Valid phone number is required');
     }
-    
+
     if (passengers && (isNaN(passengers) || passengers < 1)) {
       errors.push('Passenger count must be at least 1');
     }
-    
+
     if (errors.length > 0) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
         errors: errors,
         message: 'Validation failed'
@@ -68,7 +68,9 @@ export default async function handler(req, res) {
     }
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.hostinger.com',
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_PASS,
@@ -193,7 +195,7 @@ export default async function handler(req, res) {
             <p>If you have any questions or need immediate assistance, please contact us at:</p>
             <ul>
               <li>Phone: [Your Business Phone]</li>
-              <li>Email: <a href="mailto:booking@limo4all.ca">booking@limo4all.ca</a></li>
+              <li>Email: <a href="mailto:contact@limo4all.ca">contact@limo4all.ca</a></li>
             </ul>
           </div>
           
@@ -212,14 +214,14 @@ export default async function handler(req, res) {
       await transporter.sendMail(customerMailOptions);
     }
 
-    return res.status(200).json({ 
+    return res.status(200).json({
       success: true,
       message: 'Emails sent successfully'
     });
 
   } catch (error) {
     console.error('Email sending error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       success: false,
       error: 'Internal Server Error',
       message: 'Failed to send emails. Please try again later.'
