@@ -157,7 +157,7 @@ const AirportTransportation = () => {
                             </div>
                             <div className="p-6">
                                 <p className="text-gray-600 mb-4">25-35 minutes from downtown Toronto</p>
-                                <p className="text-primary font-medium text-lg">From $85</p>
+                                <p className="text-primary font-medium text-lg">From $90</p>
                             </div>
                         </div>
 
@@ -175,7 +175,7 @@ const AirportTransportation = () => {
                             </div>
                             <div className="p-6">
                                 <p className="text-gray-600 mb-4">10 minutes from downtown Toronto</p>
-                                <p className="text-primary font-medium text-lg">From $65</p>
+                                <p className="text-primary font-medium text-lg">From $75</p>
                             </div>
                         </div>
 
@@ -254,7 +254,7 @@ const AirportTransportation = () => {
                             <div className="grid md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-gray-200">
                                 <div className="p-8 text-center">
                                     <h3 className="text-xl font-bold mb-2">Pearson (YYZ)</h3>
-                                    <p className="text-4xl font-bold text-primary mb-4">$85+</p>
+                                    <p className="text-4xl font-bold text-primary mb-4">$90+</p>
                                     <ul className="space-y-2 text-gray-600">
                                         <li>Downtown Toronto</li>
                                         <li>Mississauga</li>
@@ -263,7 +263,7 @@ const AirportTransportation = () => {
                                 </div>
                                 <div className="p-8 text-center">
                                     <h3 className="text-xl font-bold mb-2">Billy Bishop (YTZ)</h3>
-                                    <p className="text-4xl font-bold text-primary mb-4">$65+</p>
+                                    <p className="text-4xl font-bold text-primary mb-4">$75+</p>
                                     <ul className="space-y-2 text-gray-600">
                                         <li>Downtown Toronto</li>
                                         <li>Midtown</li>

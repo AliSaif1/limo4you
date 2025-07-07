@@ -6,8 +6,8 @@ const LIMOUSINES = [
     id: 1,
     name: "Executive Stretch Limousine",
     image: "/Executive-Limo.png",
-    capacity: "8-10 passengers",
-    maxPassengers: 10,
+    capacity: "6 passengers",
+    maxPassengers: 6,
     features: [
       "Plush leather seating",
       "Premium sound system",
@@ -27,8 +27,8 @@ const LIMOUSINES = [
     id: 2,
     name: "Luxury Party Limousine",
     image: "./Party-Limo.png",
-    capacity: "12-14 passengers",
-    maxPassengers: 14,
+    capacity: "12 passengers",
+    maxPassengers: 12,
     features: [
       "Extended luxury interior",
       "State-of-the-art entertainment",
@@ -46,31 +46,10 @@ const LIMOUSINES = [
   },
   {
     id: 3,
-    name: "Luxury Sedan",
-    image: "./Sedan.png",
-    capacity: "3 passengers",
-    maxPassengers: 3,
-    features: [
-      "Executive class comfort",
-      "WiFi connectivity",
-      "Workstation setup",
-      "Discreet professional service"
-    ],
-    note: "Perfect for corporate travel",
-    availability: "https://schema.org/InStock",
-    aggregateRating: {
-      ratingValue: 4.8,
-      reviewCount: 28,
-      bestRating: 5,
-      worstRating: 1
-    }
-  },
-  {
-    id: 4,
     name: "Chevrolet Suburban",
     image: "./Chevrolet-Suburban.png",
-    capacity: "6-8 passengers",
-    maxPassengers: 8,
+    capacity: "6 passengers",
+    maxPassengers: 6,
     features: [
       "Spacious SUV luxury",
       "Premium leather seating",
@@ -87,11 +66,11 @@ const LIMOUSINES = [
     }
   },
   {
-    id: 5,
+    id: 4,
     name: "GMC Yukon",
     image: "./GMC-Yukon.png",
-    capacity: "6-7 passengers",
-    maxPassengers: 7,
+    capacity: "6 passengers",
+    maxPassengers: 6,
     features: [
       "Premium Denali trim",
       "Heated and ventilated seats",
@@ -108,11 +87,11 @@ const LIMOUSINES = [
     }
   },
   {
-    id: 6,
+    id: 5,
     name: "Cadillac Escalade",
     image: "./Escalade.png",
-    capacity: "7 passengers",
-    maxPassengers: 7,
+    capacity: "6 passengers",
+    maxPassengers: 6,
     features: [
       "Ultimate luxury SUV",
       "Handcrafted interior",
@@ -127,7 +106,28 @@ const LIMOUSINES = [
       bestRating: 5,
       worstRating: 1
     }
-  }
+  },
+  // {
+  //   id: 6,
+  //   name: "Luxury Sedan",
+  //   image: "./Sedan.png",
+  //   capacity: "3 passengers",
+  //   maxPassengers: 3,
+  //   features: [
+  //     "Executive class comfort",
+  //     "WiFi connectivity",
+  //     "Workstation setup",
+  //     "Discreet professional service"
+  //   ],
+  //   note: "Perfect for corporate travel",
+  //   availability: "https://schema.org/InStock",
+  //   aggregateRating: {
+  //     ratingValue: 4.8,
+  //     reviewCount: 28,
+  //     bestRating: 5,
+  //     worstRating: 1
+  //   }
+  // }
 ];
 
 const Fleet = () => {
